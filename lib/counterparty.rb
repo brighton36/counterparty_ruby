@@ -21,7 +21,7 @@ module Counterparty
   end
 
   # This is returned via get_burns, and represents a Burn transaction
-  class Burn < ResultClass; 
+  class Burn < ResultClass 
     attr_accessor :tx_index, :source, :block_index, :earned, :status, 
       :burned, :tx_hash
   end

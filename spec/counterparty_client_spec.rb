@@ -13,10 +13,13 @@ describe Counterparty::Client do
     its(:api_url){ should eq('http://rpc:1234@localhost:4000/api/') }
   end
 
+  # NOTE: Most of these examples are from: https://github.com/CounterpartyXCP/counterpartyd/blob/master/docs/API.rst#id8
   describe "#get_burns" do
     subject{default_cp.get_burns( order_by: 'tx_hash', order_dir: 'asc', 
       start_block: 280537, end_block: 280539 )}
+
     its('length'){ should eq(10) }
+
     its('first') do
       should eq(Counterparty::Burn.new( tx_index: 1096, 
       source: '1ADpYypUcnbezuuYpCyRCY7G4KD6a9YXiF', block_index: 280537, 
