@@ -1,7 +1,7 @@
 module Counterparty
 
   # A base class for the purpose of extending by api result hashes
-  class ResultClass
+  class CounterResource
     attr_accessor :result_attributes
 
     def initialize(attrs={})
@@ -11,17 +11,29 @@ module Counterparty
 
     def ==(b)
       ( b.respond_to?(:result_attributes) &&
-        result_attributes == b.result_attributes && 
+        result_attributes == b.try(result_attributes) && 
         @result_attributes.all?{ |k| send(k) == b.send(k) } )
     end
 
-    def self.to_get_request
-      'get_%ss' % to_s.split('::').last.gsub(/[^\A]([A-Z])/, '_\\1').downcase
+    class << self
+      attr_writer :connection
+
+      def connection
+        @connection || Counterparty.connection
+      end
+
+      def to_get_request
+        'get_%ss' % to_s.split('::').last.gsub(/[^\A]([A-Z])/, '_\\1').downcase
+      end
+
+      def find(params)
+        connection.request(to_get_request, params).collect{|r| new r}
+      end
     end
   end
 
   # This is returned via get_balance
-  class Balance < ResultClass
+  class Balance < CounterResource
     # address (string): The address that has the balance
     attr_accessor :address
 
@@ -32,21 +44,21 @@ module Counterparty
     attr_accessor :quantity
   end
 
-  class Bet < ResultClass
+  class Bet < CounterResource
   end
 
-  class BetMatch < ResultClass
+  class BetMatch < CounterResource
   end
 
-  class Broadcast < ResultClass
+  class Broadcast < CounterResource
   end
 
-  class BTCPay < ResultClass
+  class BTCPay < CounterResource
     def self.to_get_request; 'get_btcpays'; end 
   end
 
   # This is returned via get_burns, and represents a Burn transaction
-  class Burn < ResultClass 
+  class Burn < CounterResource 
     # tx_index (integer): The transaction index
     attr_accessor :tx_index
 
@@ -72,13 +84,13 @@ module Counterparty
     attr_accessor :status
   end
 
-  class Callback < ResultClass
+  class Callback < CounterResource
   end
 
-  class Cancel < ResultClass
+  class Cancel < CounterResource
   end
 
-  class Credit < ResultClass
+  class Credit < CounterResource
     # tx_index (integer): The transaction index
     attr_accessor :tx_index
 
@@ -102,7 +114,7 @@ module Counterparty
     attr_accessor :event
   end
 
-  class Debit < ResultClass
+  class Debit < CounterResource
     # tx_index (integer): The transaction index
     attr_accessor :tx_index
 
@@ -126,52 +138,52 @@ module Counterparty
     attr_accessor :event
   end
 
-  class Dividend < ResultClass
+  class Dividend < CounterResource
   end
 
-  class Issuance < ResultClass
+  class Issuance < CounterResource
   end
 
-  class Order < ResultClass
+  class Order < CounterResource
   end
 
-  class OrderMatch < ResultClass
+  class OrderMatch < CounterResource
   end
 
-  class Send < ResultClass
+  class Send < CounterResource
   end
 
-  class Message < ResultClass
+  class Message < CounterResource
   end
 
-  class Callback < ResultClass
+  class Callback < CounterResource
   end
 
-  class BetExpiration < ResultClass
+  class BetExpiration < CounterResource
   end
 
-  class OrderExpiration < ResultClass
+  class OrderExpiration < CounterResource
   end
 
-  class BetMatchExpiration < ResultClass
+  class BetMatchExpiration < CounterResource
   end
 
-  class OrderMatchExpiration < ResultClass
+  class OrderMatchExpiration < CounterResource
   end
 
-  class Rps < ResultClass
+  class Rps < CounterResource
   end
 
-  class RpsExpiration < ResultClass
+  class RpsExpiration < CounterResource
   end
 
-  class RpsMatches < ResultClass
+  class RpsMatches < CounterResource
   end
 
-  class RpsMatchExpiration < ResultClass
+  class RpsMatchExpiration < CounterResource
   end
 
-  class RpsResolve < ResultClass
+  class RpsResolve < CounterResource
     def self.to_get_request; 'rpsresolves'; end 
   end
 

@@ -1,14 +1,16 @@
 require 'spec_helper'
 
-describe Counterparty::Client do
-  let(:default_cp) { Counterparty::Client.new }
+describe Counterparty do
+  before(:all) do
+    Counterparty.production!
+  end
 
   # NOTE: Most of these examples are from: 
   # https://github.com/CounterpartyXCP/counterpartyd/blob/master/docs/API.rst#id8
  
-  describe "#get_burns" do
-    subject do 
-      default_cp.get_burns( 
+  describe Counterparty::Burn do
+    subject do
+      Counterparty::Burn.find(
         order_by: 'tx_hash', 
         order_dir: 'asc', 
         start_block: 280537, 
