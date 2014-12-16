@@ -33,7 +33,7 @@ describe Counterparty do
   
   describe "#get_balances" do
     subject do 
-      default_cp.get_balances( filters: { field: 'address', op: '==', 
+      Counterparty::Balance.find( filters: { field: 'address', op: '==', 
         value: "14qqz8xpzzEtj6zLs3M1iASP7T4mj687yq" } )
     end
 
@@ -48,7 +48,7 @@ describe Counterparty do
 
   describe "#get_debits" do
     subject do 
-      default_cp.get_debits( filters: [
+      Counterparty::Debit.find( filters: [
           {field: 'asset', op: '==', value: "XCP"},
           {field: 'quantity', op: '>', value: 200000000} 
           ],

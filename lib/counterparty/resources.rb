@@ -11,7 +11,7 @@ module Counterparty
 
     def ==(b)
       ( b.respond_to?(:result_attributes) &&
-        result_attributes == b.try(result_attributes) && 
+        result_attributes == b.result_attributes && 
         @result_attributes.all?{ |k| send(k) == b.send(k) } )
     end
 
