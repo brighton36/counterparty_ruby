@@ -29,9 +29,26 @@ module Counterparty
       raise JsonResponseError.new response if response.has_key? 'code'
       raise ResponseError.new response['error'] if response.has_key? 'error'
 
-      puts "Here:"+response.inspect
-
       response['result']
+    end
+
+    def self.resource_request(klass)
+      define_method(klass.to_get_request){ |params| klass.find params }
+
+      # TODO: Add the creates?
+    end
+
+    # Go ahead and setup the defined resources, and throw them into the native-style
+    # api methods:
+    Counterparty.constants.each do |c| 
+      begin
+        klass = Counterparty.const_get(c)
+        if klass.respond_to?(:api_name) && klass != Counterparty::CounterResource
+          self.resource_request klass 
+        end
+      rescue NameError
+        next
+      end
     end
 
   end

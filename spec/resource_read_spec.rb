@@ -111,9 +111,6 @@ describe Counterparty do
   describe "#get_btcpays" do
   end
   
-  describe "#get_burns" do
-  end
-  
   describe "#get_callbacks" do
   end
   

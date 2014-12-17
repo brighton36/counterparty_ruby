@@ -25,17 +25,5 @@ module Counterparty
       @connection = Connection.new
     end
 
-    def resource_request(klass)
-      define_method(klass.to_get_request){ |params| klass.find params }
-
-      # TODO: Add the creates?
-    end
-
-    # Go ahead and setup the defined resources, and throw them into the native-style
-    # api methods:
-    constants.each do |klass|
-      resource_request klass if klass.kind_of? CounterResource
-    end
-
   end
 end
