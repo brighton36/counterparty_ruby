@@ -1,4 +1,8 @@
 module Counterparty
+
+  class JsonResponseError < StandardError; end
+  class ResponseError < StandardError; end
+
   
   # This class connects to the api. Mostly it's not intended for use by library
   # consumers, but there are some helper methods in here for those that prefer 
@@ -9,12 +13,6 @@ module Counterparty
     def initialize(port=14000, username='rpc', password='1234', host='localhost')
       @host,@port,@username,@password=host.to_s,port.to_i,username.to_s,password.to_s
     end
-
-    def self.read_request(klass)
-      define_method(klass.to_get_request){ |params| klass.find params }
-    end
-
-    include Counterparty::ReadRequests
 
     # The url being connected to for the purpose of an api call
     def api_url
@@ -28,7 +26,10 @@ module Counterparty
         content_type: 'json' )
 
       # TODO: Make this work? Test perhaps?
-      raise JsonResponseError.new response if response['code'] 
+      raise JsonResponseError.new response if response.has_key? 'code'
+      raise ResponseError.new response['error'] if response.has_key? 'error'
+
+      puts "Here:"+response.inspect
 
       response['result']
     end
