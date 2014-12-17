@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    counterparty (0.0.1)
+    counterparty_ruby (0.0.1)
       rest_client
 
 GEM
@@ -10,6 +10,7 @@ GEM
     diff-lcs (1.2.5)
     json (1.8.1)
     netrc (0.7.9)
+    rake (10.3.2)
     rdoc (4.2.0)
       json (~> 1.4)
     rest_client (1.8.2)
@@ -34,7 +35,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  counterparty!
+  counterparty_ruby!
+  rake
   rdoc
   rspec
   rspec-its
