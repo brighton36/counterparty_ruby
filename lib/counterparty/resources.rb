@@ -28,16 +28,19 @@ module Counterparty
     # (string): The address with the feed that the bet is to be made on
     attr_accessor :feed_address 
 
-    # (integer): 0 for Bullish CFD, 1 for Bearish CFD, 2 for Equal, 3 for Not Equal
+    # (integer): 0 for Bullish CFD, 1 for Bearish CFD, 2 for Equal, 3 for Not 
+    # Equal
     attr_accessor :bet_type 
 
-    # (integer): The timestamp at which the bet should be decided/settled, in Unix time.
+    # (integer): The timestamp at which the bet should be decided/settled, in 
+    # Unix time.
     attr_accessor :deadline 
 
     # (integer): The quantity of XCP to wager
     attr_accessor :wager_quantity 
 
-    # (integer): The minimum quantity of XCP to be wagered by the user to bet against the bet issuer, if the other party were to accept the whole thing
+    # (integer): The minimum quantity of XCP to be wagered by the user to bet 
+    # against the bet issuer, if the other party were to accept the whole thing
     attr_accessor :counterwager_quantity 
 
     # (integer): The quantity of XCP wagered that is remaining to bet on
@@ -58,7 +61,8 @@ module Counterparty
     # (integer):
     attr_accessor :fee_multiplier 
 
-    # (string): Set to "valid" if a valid bet. Any other setting signifies an invalid/improper bet 
+    # (string): Set to "valid" if a valid bet. Any other setting signifies an 
+    # invalid/improper bet 
     attr_accessor :validity 
   end
 
@@ -78,7 +82,8 @@ module Counterparty
     # (string): The address that issued the initial bet
     attr_accessor :tx0_address 
 
-    # (string): The type of the initial bet (0 for Bullish CFD, 1 for Bearish CFD, 2 for Equal, 3 for Not Equal)
+    # (string): The type of the initial bet (0 for Bullish CFD, 
+    # 1 for Bearish CFD, 2 for Equal, 3 for Not Equal)
     attr_accessor :tx0_bet_type 
 
     # (integer): The transaction index of the matching (counter) bet
@@ -96,7 +101,8 @@ module Counterparty
     # (integer): The number of blocks over which the matching bet was valid
     attr_accessor :tx1_expiration 
 
-    # (string): The type of the counter bet (0 for Bullish CFD, 1 for Bearish CFD, 2 for Equal, 3 for Not Equal)
+    # (string): The type of the counter bet (0 for Bullish CFD, 
+    # 1 for Bearish CFD, 2 for Equal, 3 for Not Equal)
     attr_accessor :tx1_bet_type 
 
     # (string): The address of the feed that the bets refer to
@@ -123,7 +129,8 @@ module Counterparty
     # (integer):
     attr_accessor :fee_multiplier 
 
-    # (string): Set to "valid" if a valid order match. Any other setting signifies an invalid/improper order match
+    # (string): Set to "valid" if a valid order match. Any other setting 
+    # signifies an invalid/improper order match
     attr_accessor :validity 
   end
 
@@ -146,13 +153,15 @@ module Counterparty
     # (float): The numerical value of the broadcast
     attr_accessor :value 
 
-    # (float): How much of every bet on this feed should go to its operator; a fraction of 1, (i.e. .05 is five percent)
+    # (float): How much of every bet on this feed should go to its operator; 
+    # a fraction of 1, (i.e. .05 is five percent)
     attr_accessor :fee_multiplier 
 
     # (string): The textual component of the broadcast
     attr_accessor :text 
 
-    # (string): Set to "valid" if a valid broadcast. Any other setting signifies an invalid/improper broadcast
+    # (string): Set to "valid" if a valid broadcast. Any other setting signifies 
+    # an invalid/improper broadcast
     attr_accessor :validity 
   end
 
@@ -196,13 +205,16 @@ module Counterparty
     # (integer): The quantity of BTC burned
     attr_accessor :burned
 
-    # (integer): The quantity of XPC actually earned from the burn (takes into account any bonus quantitys, 1 BTC limitation, etc)
+    # (integer): The quantity of XPC actually earned from the burn (takes into 
+    # account any bonus quantitys, 1 BTC limitation, etc)
     attr_accessor :earned
 
-    # (string): Set to "valid" if a valid burn. Any other setting signifies an invalid/improper burn
+    # (string): Set to "valid" if a valid burn. Any other setting signifies an 
+    # invalid/improper burn
     attr_accessor :validity
 
-    # (string): Set to "valid" if a valid burn. Any other setting signifies an invalid/improper burn
+    # (string): Set to "valid" if a valid burn. Any other setting signifies an 
+    # invalid/improper burn
     attr_accessor :status
   end
 
@@ -216,19 +228,25 @@ module Counterparty
     # block_index (integer): The block index (block number in the block chain)
     attr_accessor :block_index 
 
-    # (string): The source address of the call back (should be the current owner of the asset)
+    # (string): The source address of the call back (should be the current owner 
+    # of the asset)
     attr_accessor :source 
 
-    # (integer): A floating point number greater than zero but less than or equal to 1, where 0% is for a callback of 0%
+    # (integer): A floating point number greater than zero but less than or 
+    # equal to 1, where 0% is for a callback of 0%
     attr_accessor :fraction 
 
-    # of the balance of each of the asset's holders, and 1 would be for a callback of 100%). For example, 0.56 would be 56%. Each holder of the called asset will be paid the call price for the asset, times the number of units of that asset that were called back from them.
+    # of the balance of each of the asset's holders, and 1 would be for a 
+    # callback of 100%). For example, 0.56 would be 56%. Each holder of the 
+    # called asset will be paid the call price for the asset, times the number 
+    # of units of that asset that were called back from them.
     attr_accessor :of 
 
     # (string): The asset being called back
     attr_accessor :asset 
 
-    # (string): Set to "valid" if a valid send. Any other setting signifies an invalid/improper send
+    # (string): Set to "valid" if a valid send. Any other setting signifies an 
+    # invalid/improper send
     attr_accessor :validity 
   end
 
@@ -248,7 +266,8 @@ module Counterparty
     # (string): The transaction hash of the order or bet cancelled
     attr_accessor :offer_hash 
 
-    # (string): Set to "valid" if a valid burn. Any other setting signifies an invalid/improper burn
+    # (string): Set to "valid" if a valid burn. Any other setting signifies an 
+    # invalid/improper burn
     attr_accessor :validity 
   end
 
@@ -319,7 +338,8 @@ module Counterparty
     # (integer): The quantity of XCP rewarded per whole unit of the asset
     attr_accessor :quantity_per_unit 
 
-    # (string): Set to "valid" if a valid burn. Any other setting signifies an invalid/improper burn
+    # (string): Set to "valid" if a valid burn. Any other setting signifies an 
+    # invalid/improper burn
     attr_accessor :validity 
   end
 
@@ -339,16 +359,19 @@ module Counterparty
     # (integer): The quantity of the specified asset being issued
     attr_accessor :quantity 
 
-    # (boolean): Whether or not the asset is divisible (must agree with previous issuances of the asset, if there are any)
+    # (boolean): Whether or not the asset is divisible (must agree with previous 
+    # issuances of the asset, if there are any)
     attr_accessor :divisible 
 
     # issuer (string):
     attr_accessor :issuer 
 
-    # (boolean): Whether or not this objects marks the transfer of ownership rights for the specified quantity of this asset
+    # (boolean): Whether or not this objects marks the transfer of ownership 
+    # rights for the specified quantity of this asset
     attr_accessor :transfer 
 
-    # (string): Set to "valid" if a valid issuance. Any other setting signifies an invalid/improper issuance
+    # (string): Set to "valid" if a valid issuance. Any other setting signifies 
+    # an invalid/improper issuance
     attr_accessor :validity 
   end
 
@@ -383,16 +406,19 @@ module Counterparty
     # (integer): The quantity of the specified get asset remaining for the order
     attr_accessor :get_remaining 
 
-    # (float): The given exchange rate (as an exchange ratio desired from the asset offered to the asset desired)
+    # (float): The given exchange rate (as an exchange ratio desired from the 
+    # asset offered to the asset desired)
     attr_accessor :price 
 
     # (integer): The number of blocks over which the order should be valid
     attr_accessor :expiration 
 
-    # (integer): The miners' fee provided; in BTC; required only if selling BTC (should not be lower than is required for acceptance in a block)
+    # (integer): The miners' fee provided; in BTC; required only if selling BTC 
+    # (should not be lower than is required for acceptance in a block)
     attr_accessor :fee_provided 
 
-    # (integer): The miners' fee required to be paid by orders for them to match this one; in BTC; required only if buying BTC (may be zero, though)
+    # (integer): The miners' fee required to be paid by orders for them to match 
+    # this one; in BTC; required only if buying BTC (may be zero, though)
     attr_accessor :fee_required 
   end
 
@@ -439,7 +465,8 @@ module Counterparty
     # (integer): The quantity of the specified backward asset
     attr_accessor :backward_quantity 
 
-    # (string): Set to "valid" if a valid order match. Any other setting signifies an invalid/improper order match
+    # (string): Set to "valid" if a valid order match. Any other setting 
+    # signifies an invalid/improper order match
     attr_accessor :validity 
   end
 
@@ -465,7 +492,8 @@ module Counterparty
     # (integer): The quantity of the specified asset sent
     attr_accessor :quantity
 
-    # (string): Set to "valid" if a valid send. Any other setting signifies an invalid/improper send
+    # (string): Set to "valid" if a valid send. Any other setting signifies an 
+    # invalid/improper send
     attr_accessor :validity
   end
 
@@ -473,16 +501,21 @@ module Counterparty
     # (integer): The message index (i.e. transaction index)
     attr_accessor :message_index 
 
-    # (integer): The block index (block number in the block chain) this event occurred on
+    # (integer): The block index (block number in the block chain) this event 
+    # occurred on
     attr_accessor :block_index 
 
-    # (string): A string denoting the entity that the message relates to, e.g. "credits", "burns", "debits". The category matches the relevant table name in counterpartyd (see blocks.py for more info).
+    # (string): A string denoting the entity that the message relates to, e.g. 
+    # "credits", "burns", "debits". The category matches the relevant table name 
+    # in counterpartyd (see blocks.py for more info).
     attr_accessor :category 
 
-    # (string): The operation done to the table noted in category. This is either "insert", or "update".
+    # (string): The operation done to the table noted in category. This is 
+    # either "insert", or "update".
     attr_accessor :command 
 
-    # (string): A JSON-encoded object containing the message data. The properties in this object match the columns in the table referred to by category.
+    # (string): A JSON-encoded object containing the message data. The 
+    # properties in this object match the columns in the table referred to by category.
     attr_accessor :bindings 
   end
 
@@ -496,7 +529,8 @@ module Counterparty
     # (integer): The block index (block number in the block chain)
     attr_accessor :block_index 
 
-    # (string): The source address of the call back (should be the current owner of the asset)
+    # (string): The source address of the call back (should be the current owner 
+    # of the asset)
     attr_accessor :source 
 
     # (integer): A floating point number greater than zero but less than 
@@ -510,7 +544,8 @@ module Counterparty
     # asset (string): The asset being called back
     attr_accessor :asset 
 
-    # (string): Set to "valid" if a valid send. Any other setting signifies an invalid/improper send
+    # (string): Set to "valid" if a valid send. Any other setting signifies an 
+    # invalid/improper send
     attr_accessor :validity 
   end
 
@@ -521,7 +556,8 @@ module Counterparty
     # bet_hash (string): The transaction hash of the bet expiriing
     attr_accessor :bet_hash 
 
-    # (integer): The block index (block number in the block chain) when this expiration occurred
+    # (integer): The block index (block number in the block chain) when this 
+    # expiration occurred
     attr_accessor :block_index 
 
     # (string): The source address that created the bet
@@ -535,7 +571,8 @@ module Counterparty
     # (string): The transaction hash of the order expiriing
     attr_accessor :order_hash 
 
-    # (integer): The block index (block number in the block chain) when this expiration occurred
+    # (integer): The block index (block number in the block chain) when this 
+    # expiration occurred
     attr_accessor :block_index 
 
     # (string): The source address that created the order
@@ -543,7 +580,8 @@ module Counterparty
   end
 
   class BetMatchExpiration < CounterResource
-    # (integer): The transaction index of the bet match ID (e.g. the concatenation of the tx0 and tx1 hashes)
+    # (integer): The transaction index of the bet match ID (e.g. the 
+    # concatenation of the tx0 and tx1 hashes)
     attr_accessor :bet_match_id 
 
     # (string): The tx0 (first) address for the bet match
@@ -552,12 +590,14 @@ module Counterparty
     # (string): The tx1 (second) address for the bet match
     attr_accessor :tx1_address 
 
-    # (integer): The block index (block number in the block chain) when this expiration occurred
+    # (integer): The block index (block number in the block chain) when this 
+    # expiration occurred
     attr_accessor :block_index 
   end
 
   class OrderMatchExpiration < CounterResource
-    # (integer): The transaction index of the order match ID (e.g. the concatenation of the tx0 and tx1 hashes)
+    # (integer): The transaction index of the order match ID (e.g. the 
+    # concatenation of the tx0 and tx1 hashes)
     attr_accessor :order_match_id 
 
     # (string): The tx0 (first) address for the order match
@@ -566,7 +606,8 @@ module Counterparty
     # (string): The tx1 (second) address for the order match
     attr_accessor :tx1_address 
 
-    # (integer): The block index (block number in the block chain) when this expiration occurred
+    # (integer): The block index (block number in the block chain) when this 
+    # expiration occurred
     attr_accessor :block_index 
   end
 end

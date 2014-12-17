@@ -4,9 +4,9 @@ require File.expand_path('../lib/counterparty/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Chris DeRose"]
   gem.email         = ["chris@chrisderose.com"]
-  gem.description   = %q{TODO}
-  gem.summary       = %q{TODO}
-  gem.homepage      = "TODO"
+  gem.description   = %q{This gem is designed to abstract communications with the counterpartyd api server in an ActiveRecord-esque object model}
+  gem.summary       = %q{An ActiveRecord-esque abstraction of the Counterparty API}
+  gem.homepage      = "https://github.com/brighton36/counterparty_ruby"
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
