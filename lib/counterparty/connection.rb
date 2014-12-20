@@ -19,6 +19,16 @@ module Counterparty
       'http://%s:%s@%s:%s/api/' % [@username,@password,@host,@port.to_s]
     end
 
+    # Returns a signed raw transaction, given a private key
+    def sign_tx(raw_tx, private_key)
+      # TODO
+    end
+
+    # Broadcasts a signed transaction onto the bitcoin blockchain
+    def broadcast_tx(signed_tx)
+      # TODO
+    end
+
     def request(method, params)
       response = JSON.parse RestClient.post(api_url, { method: method, 
         params: params, jsonrpc: '2.0', id: '0' }.to_json,

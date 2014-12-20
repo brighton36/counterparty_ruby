@@ -14,11 +14,17 @@ module Counterparty
         @result_attributes.all?{ |k| send(k) == b.send(k) } )
     end
 
+    # This method returns the unsigned raw create transaction string. hex encoded (i.e. the same format that bitcoind returns with its raw transaction API calls).
+    def to_raw_tx
+      connection.request to_create_request, to_params
+    end
+
+    def to_signed_tx(private_key)
+      connection.sign_tx to_raw_tx, private_key
+    end
+
     def save!
-      puts to_params.inspect
-      ret = connection.request to_create_request, to_params
-      puts "Ret:"+ret.inspect
-      ret
+      connection.request to_do_request, to_params
     end
 
     private
@@ -32,6 +38,10 @@ module Counterparty
         v = self.send(k)
         (v) ? [k,self.send(k)] : nil
       }.compact.flatten]
+    end
+
+    def to_do_request
+      'do_%s' % self.class.api_name
     end
 
     def to_create_request

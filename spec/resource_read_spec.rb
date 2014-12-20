@@ -4,7 +4,6 @@ require 'spec_helper'
 # https://github.com/CounterpartyXCP/counterpartyd/blob/master/docs/API.rst#id8
 describe Counterparty do
   before(:all) { Counterparty.production! }
-
  
   # Get all burns between blocks 280537 and 280539 where greater than .2 BTC was 
   # burned, sorting by tx_hash (ascending order) With this (and the rest of the 
@@ -87,76 +86,4 @@ describe Counterparty do
       ) )
     end
   end
-
-  describe "#get_credits" do
-    pending
-  end
-
-  describe "#get_debits" do
-    pending
-  end
- 
-  describe "#get_bets" do
-    # pending
-  end
-  
-  describe "#get_bet_matches" do
-    # pending
-  end
-  
-  describe "#get_broadcasts" do
-    # You get the idea...
-  end
-  
-  describe "#get_btcpays" do
-  end
-  
-  describe "#get_callbacks" do
-  end
-  
-  describe "#get_cancels" do
-  end
-  
-  describe "#get_dividends" do
-  end
-  
-  describe "#get_issuances" do
-  end
-  
-  describe "#get_orders" do
-  end
-  
-  describe "#get_order_matches" do
-  end
-  
-  describe "#get_sends" do
-  end
-  
-  describe "#get_bet_expirations" do
-  end
-  
-  describe "#get_order_expirations" do
-  end
-  
-  describe "#get_bet_match_expirations" do
-  end
-  
-  describe "#get_order_match_expirations" do
-  end
-  
-  describe "#get_rps" do
-  end
-  
-  describe "#get_rps_expirations" do
-  end
-  
-  describe "#get_rps_matches" do
-  end
-  
-  describe "#get_rps_match_expirations" do
-  end
-  
-  describe "#get_rpsresolves" do
-  end
-
 end

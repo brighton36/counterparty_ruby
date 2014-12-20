@@ -19,7 +19,7 @@ Gem::Specification.new do |gem|
   ['rest_client'].each do |dependency|
     gem.add_runtime_dependency dependency
   end
-  ['rspec', 'rspec-its', 'rake', 'rdoc'].each do |dependency|
+  ['rspec', 'rspec-its', 'rake', 'rdoc','bitcoin-client'].each do |dependency|
     gem.add_development_dependency dependency
   end
 end

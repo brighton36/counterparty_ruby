@@ -8,7 +8,7 @@ This gem is designed to abstract communications with the counterpartyd api serve
 Documentation on the objects is available via ruby-doc, but a better guide to
 getting started is available on [counterparty's official API guide](https://github.com/CounterpartyXCP/counterpartyd/blob/master/docs/API.rst#read-api-function-reference).
 
-### Find the first burn (Active Record Syntax):
+#### Find the first burn (Active Record Syntax):
 ```ruby
 gem 'counterparty_ruby'
 
@@ -21,7 +21,7 @@ puts "First burned via: %s" % burns.first.source
 # => 1ADpYypUcnbezuuYpCyRCY7G4KD6a9YXiF
 ```
 
-### Find the first burn (Alternative API-like syntax)
+#### Find the first burn (Alternative API-like syntax)
 ```ruby
 gem 'counterparty_ruby'
 
