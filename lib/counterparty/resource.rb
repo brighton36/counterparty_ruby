@@ -2,6 +2,27 @@ module Counterparty
   # A base class for the purpose of extending by api result hashes
   class CounterResource
     attr_accessor :result_attributes
+    
+    # encoding (string): The encoding method to use
+    attr_accessor :encoding
+
+    # pubkey (string): The pubkey hex string. Required if multisig transaction 
+    # encoding is specified for a key external to counterpartyd's local wallet.
+    attr_accessor :pubkey
+
+    # allow_unconfirmed_inputs (boolean): Set to true to allow this transaction 
+    # to utilize unconfirmed UTXOs as inputs.
+    attr_accessor :allow_unconfirmed_inputs
+
+    # fee (integer): If you'd like to specify a custom miners' fee, specify it 
+    # here (in satoshi). Leave as default for counterpartyd to automatically 
+    # choose.
+    attr_accessor :fee
+
+    # fee_per_kb (integer): The fee per kilobyte of transaction data constant 
+    # that counterpartyd uses when deciding on the dynamic fee to use 
+    # (in satoshi). Leave as default unless you know what you're doing.
+    attr_accessor :fee_per_kb
 
     def initialize(attrs={})
       @result_attributes = attrs.keys.sort.collect(&:to_sym)
@@ -14,10 +35,13 @@ module Counterparty
         @result_attributes.all?{ |k| send(k) == b.send(k) } )
     end
 
-    # This method returns the unsigned raw create transaction string. hex encoded (i.e. the same format that bitcoind returns with its raw transaction API calls).
+    # This method returns the unsigned raw create transaction string. hex 
+    # encoded (i.e. the same format that bitcoind returns with its raw 
+    # transaction API calls).
     def to_raw_tx
       connection.request to_create_request, to_params
     end
+
 
     def to_signed_tx(private_key)
       connection.sign_tx to_raw_tx, private_key

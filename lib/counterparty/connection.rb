@@ -1,17 +1,38 @@
 module Counterparty
 
   class JsonResponseError < StandardError; end
-  class ResponseError < StandardError; end
 
+  class ResponseError < StandardError
+    attr_reader :data_type
+    attr_reader :data_args
+    attr_reader :data_message
+    attr_reader :code
+    attr_reader :message
+
+    def initialize(json)
+      @message, @code = json['message'], json['code']
+
+      json['data'].each_pair do |(k,v)|
+        instance_variable_set '@data_%s' % k, v
+      end if json.has_key? 'data'
+
+      super
+    end
+  end
   
   # This class connects to the api. Mostly it's not intended for use by library
   # consumers, but there are some helper methods in here for those that prefer 
   # the Connection.get_burns syntax instead of the Counterparty::Burn.find syntax
   class Connection
+    DEFAULT_TIMEOUT = -1
+
     attr_accessor :host, :port, :username, :password
+
+    attr_writer :timeout
 
     def initialize(port=14000, username='rpc', password='1234', host='localhost')
       @host,@port,@username,@password=host.to_s,port.to_i,username.to_s,password.to_s
+      @timeout = DEFAULT_TIMEOUT
     end
 
     # The url being connected to for the purpose of an api call
@@ -30,12 +51,12 @@ module Counterparty
     end
 
     def request(method, params)
-      response = JSON.parse RestClient.post(api_url, { method: method, 
+      client = RestClient::Resource.new api_url, :timeout => @timeout
+      response = JSON.parse client.post({ method: method, 
         params: params, jsonrpc: '2.0', id: '0' }.to_json,
         user: @username, password: @password, accept: 'json', 
         content_type: 'json' )
 
-      # TODO: Make this work? Test perhaps?
       raise JsonResponseError.new response if response.has_key? 'code'
       raise ResponseError.new response['error'] if response.has_key? 'error'
 

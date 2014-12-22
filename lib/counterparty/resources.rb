@@ -216,6 +216,9 @@ module Counterparty
     # (string): Set to "valid" if a valid burn. Any other setting signifies an 
     # invalid/improper burn
     attr_accessor :status
+    
+    # (integer): The amount of BTC to burn (only used in the Create Burn) 
+    attr_accessor :quantity
   end
 
   class Callback < CounterResource
@@ -373,6 +376,30 @@ module Counterparty
     # (string): Set to "valid" if a valid issuance. Any other setting signifies 
     # an invalid/improper issuance
     attr_accessor :validity 
+
+    # (string): This is used when creating an issuance, and indicates the source
+    # address of the asset
+    attr_accessor :source
+    
+    # (string): This is used when creating an issuance, and indicates 
+    # the destination address of the asset
+    attr_accessor :description
+
+    # (string): This is used when creating an issuance transfer, and indicates 
+    # the destination address of the asset
+    attr_accessor :transfer_destination
+
+    # (integer): This is used when creating an issuance, and indicates 
+    # the call date
+    attr_accessor :call_date
+
+    # (integer): This is used when creating an issuance, and indicates 
+    # the call price
+    attr_accessor :call_price
+
+    # (boolean): This is used when creating an issuance, and indicates 
+    # whether the asset is callable
+    attr_accessor :callable
   end
 
   class Order < CounterResource

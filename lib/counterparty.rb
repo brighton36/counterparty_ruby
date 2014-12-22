@@ -8,7 +8,8 @@ require 'counterparty/connection'
 
 module Counterparty
   # One XCP, in units of Satoshi
-  ONE_XCP = 100000000 
+  ONE_XCP = 100_000_000 
+  ONE_BTC = 100_000_000 
 
   class << self
     # There is no default password, so really all this acheives is the prevention
