@@ -9,24 +9,26 @@ require 'counterparty/connection'
 module Counterparty
   # One XCP, in units of Satoshi
   ONE_XCP = 100_000_000 
+  
+  # One BTC, in units of Satoshi
   ONE_BTC = 100_000_000 
 
   class << self
-    # There is no default password, so really all this acheives is the prevention
-    # of .bitcoin being nil
-    BTC_TESTNET = ['rpc', 'password', :host => 'localhost', :port => 18333 ]
-
+    # Sets/Gets the default connection object
     attr_writer :connection
-    attr_writer :bitcoin
 
     def connection
       @connection || Connection.new
     end
 
+    # Establishes the default connection for new objects as being the default 
+    # counterparty production mode port/user/ip
     def production!
       @connection = Connection.new 4000
     end
 
+    # Establishes the default connection for new objects as being the default 
+    # counterparty test mode port/user/ip
     def test!
       @connection = Connection.new
     end

@@ -1,6 +1,6 @@
 module Counterparty
 
-  # This is returned via get_balance
+  # An object that describes a balance that is associated to a specific address.
   class Balance < CounterResource
     # (string): The address that has the balance
     attr_accessor :address
@@ -12,6 +12,7 @@ module Counterparty
     attr_accessor :quantity
   end
 
+  # An object that describes a specific bet.
   class Bet < CounterResource
     # (integer): The transaction index
     attr_accessor :tx_index 
@@ -64,8 +65,17 @@ module Counterparty
     # (string): Set to "valid" if a valid bet. Any other setting signifies an 
     # invalid/improper bet 
     attr_accessor :validity 
+
+    # (integer): The quantity of XCP to wager. (Only used in Create)
+    attr_accessor :wager
+
+    # (integer): The minimum quantity of XCP to be 
+    # wagered against, for the bets to match. (Only used in Create)
+    attr_accessor :counterwager 
   end
 
+  # An object that describes a specific occurance of two bets being matched 
+  # (either partially, or fully).
   class BetMatch < CounterResource
     # (integer): The Bitcoin transaction index of the initial bet
     attr_accessor :tx0_index 
@@ -134,6 +144,8 @@ module Counterparty
     attr_accessor :validity 
   end
 
+  # An object that describes a specific occurance of a broadcast event 
+  # (i.e. creating/extending a feed)
   class Broadcast < CounterResource
     # (integer): The transaction index
     attr_accessor :tx_index 
@@ -163,8 +175,14 @@ module Counterparty
     # (string): Set to "valid" if a valid broadcast. Any other setting signifies 
     # an invalid/improper broadcast
     attr_accessor :validity 
+
+    # (float): How much of every bet on this feed should go to its 
+    # operator; a fraction of 1, (i.e. .05 is five percent). Used on create.
+    attr_accessor :fee_fraction
   end
 
+  # An object that matches a request to settle an Order Match for which BTC is 
+  # owed.
   class BTCPay < CounterResource
     # (integer): The transaction index
     attr_accessor :tx_index 
@@ -184,11 +202,10 @@ module Counterparty
     # (string): Set to "valid" if valid
     attr_accessor :validity 
 
-
     def self.api_name; 'btcpays'; end 
   end
 
-  # This is returned via get_burns, and represents a Burn transaction
+  # An object that describes an instance of a specific burn.
   class Burn < CounterResource 
     # (integer): The transaction index
     attr_accessor :tx_index
@@ -221,6 +238,8 @@ module Counterparty
     attr_accessor :quantity
   end
 
+  # An object that describes a specific asset callback (i.e. the exercising of 
+  # a call option on an asset owned by the source address).
   class Callback < CounterResource
     # (integer): The transaction index
     attr_accessor :tx_index 
@@ -253,6 +272,7 @@ module Counterparty
     attr_accessor :validity 
   end
 
+  # An object that describes a cancellation of a (previously) open order or bet.
   class Cancel < CounterResource
     # (integer): The transaction index
     attr_accessor :tx_index 
@@ -274,6 +294,7 @@ module Counterparty
     attr_accessor :validity 
   end
 
+  # An object that describes a account credit.
   class Credit < CounterResource
     # (integer): The transaction index
     attr_accessor :tx_index
@@ -298,6 +319,7 @@ module Counterparty
     attr_accessor :event
   end
 
+  # An object that describes a account debit or credit.
   class Debit < CounterResource
     # (integer): The transaction index
     attr_accessor :tx_index
@@ -322,6 +344,8 @@ module Counterparty
     attr_accessor :event
   end
 
+  # An object that describes an issuance of dividends on a specific user 
+  # defined asset.
   class Dividend < CounterResource
     # (integer): The transaction index
     attr_accessor :tx_index 
@@ -344,8 +368,13 @@ module Counterparty
     # (string): Set to "valid" if a valid burn. Any other setting signifies an 
     # invalid/improper burn
     attr_accessor :validity 
+
+    # (string, required): The asset that the dividends are paid in.
+    attr_accessor :dividend_asset
   end
 
+  # An object that describes a specific occurance of a user defined asset being 
+  # issued, or re-issued
   class Issuance < CounterResource
     # (integer): The transaction index
     attr_accessor :tx_index 
@@ -402,6 +431,7 @@ module Counterparty
     attr_accessor :callable
   end
 
+  # An object that describes a specific order.
   class Order < CounterResource
     # (integer): The transaction index
     attr_accessor :tx_index 
@@ -449,6 +479,8 @@ module Counterparty
     attr_accessor :fee_required 
   end
 
+  # An object that describes a specific occurance of two orders being matched 
+  # (either partially, or fully)
   class OrderMatch < CounterResource
     # (integer): The Bitcoin transaction index of the first (earlier) order
     attr_accessor :tx0_index 
@@ -497,6 +529,8 @@ module Counterparty
     attr_accessor :validity 
   end
 
+  # An object that describes a specific send (e.g. "simple send", of XCP, or a 
+  # user defined asset).
   class Send < CounterResource
     # (integer): The transaction index
     attr_accessor :tx_index
@@ -524,6 +558,9 @@ module Counterparty
     attr_accessor :validity
   end
 
+  # An object that describes a specific event in the counterpartyd message feed 
+  # (which can be used by 3rd party applications to track state changes to the 
+  # counterpartyd database on a block-by-block basis).
   class Message < CounterResource
     # (integer): The message index (i.e. transaction index)
     attr_accessor :message_index 
@@ -546,6 +583,8 @@ module Counterparty
     attr_accessor :bindings 
   end
 
+  # An object that describes a specific asset callback (i.e. the exercising of 
+  # a call option on an asset owned by the source address).
   class Callback < CounterResource
     # (integer): The transaction index
     attr_accessor :tx_index 
@@ -576,6 +615,8 @@ module Counterparty
     attr_accessor :validity 
   end
 
+  # An object that describes the expiration of a bet created by the source 
+  # address.
   class BetExpiration < CounterResource
     # (integer): The transaction index of the bet expiring
     attr_accessor :bet_index 
@@ -591,6 +632,8 @@ module Counterparty
     attr_accessor :source 
   end
 
+  # An object that describes the expiration of an order created by the source 
+  # address.
   class OrderExpiration < CounterResource
     # (integer): The transaction index of the order expiring
     attr_accessor :order_index 
@@ -606,6 +649,7 @@ module Counterparty
     attr_accessor :source 
   end
 
+  # An object that describes the expiration of a bet match.
   class BetMatchExpiration < CounterResource
     # (integer): The transaction index of the bet match ID (e.g. the 
     # concatenation of the tx0 and tx1 hashes)
@@ -622,6 +666,7 @@ module Counterparty
     attr_accessor :block_index 
   end
 
+  # An object that describes the expiration of an order match.
   class OrderMatchExpiration < CounterResource
     # (integer): The transaction index of the order match ID (e.g. the 
     # concatenation of the tx0 and tx1 hashes)
