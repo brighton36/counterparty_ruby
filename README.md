@@ -124,9 +124,9 @@ The _best_ place to start is the [Counterparty API reference](https://github.com
 You'll soon find that this gem is merely a wrapper around the official 
 counterpartyd json API.
 
-But, if that doesn't help tweet @derosetech and/or check the 
-[Counterparty Forums](https://forums.counterparty.io/) for more help from the
-community. 
+But, if that doesn't help tweet [@derosetech](https://twitter.com/derosetech) 
+and/or check the [Counterparty Forums](https://forums.counterparty.io/) for more 
+help from the community. 
 
 We appreciate your patience if you're having problems, please bear in mind that 
 we're in active development mode. And thank-you for using Counterparty!
