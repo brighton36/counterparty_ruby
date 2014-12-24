@@ -11,12 +11,4 @@ describe Counterparty::Connection do
     its(:password){ should eq('1234') }
     its(:api_url){ should eq('http://rpc:1234@localhost:14000/api/') }
   end
-
-  describe "#sign_tx" do
-    pending
-  end
-
-  describe "#broadcast_tx" do
-    pending
-  end
 end

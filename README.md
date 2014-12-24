@@ -29,7 +29,8 @@ setting everything up.
 Documentation on the objects is available via ruby-doc, but a better guide to
 getting started is available on [counterparty's official API guide](https://github.com/CounterpartyXCP/counterpartyd/blob/master/docs/API.rst#read-api-function-reference).
 
-#### Find the first burn (Active Record Syntax):
+#### Find the first burn
+Here we retrieve burns from the blockchain using ActiveRecord style method calls.
 ```ruby
 gem 'counterparty_ruby'
 
@@ -43,6 +44,8 @@ puts "First burned via: %s" % burns.first.source
 ```
 
 #### Find the first burn (Alternative API-like syntax)
+This example achieves the same outcome as the above example, but uses a more 
+json-esque call syntax.
 ```ruby
 gem 'counterparty_ruby'
 
@@ -58,6 +61,7 @@ puts "First burned via: %s" % burns.first.source
 ```
 
 #### Create an Issuance
+Here we create an asset and persist that asset intothe blockchain using ActiveRecord style method calls.
 ```ruby
 gem 'counterparty_ruby'
 
@@ -76,6 +80,8 @@ puts "Transaction %s has been entered into the mempool" % transaction_id
 ```
 
 #### Create an Issuance (Alternative API-like syntax)
+This example achieves the same outcome as the above example, but uses a more 
+json-esque call syntax.
 ```ruby
 gem 'counterparty_ruby'
 
@@ -91,13 +97,35 @@ transaction_id = Counterparty.connection.do_issuance(
 puts "Transaction %s has been entered into the mempool" % transaction_id
 ```
 
+#### Broadcast the outcome of an event
+If you're the oracle, tasked with resolving a bet, here's how you would announce
+an outcome to the network.
+```ruby
+gem 'counterparty_ruby'
+
+gold_down = Counterparty::Broadcast.new 
+  source: 'msCXwsPVbv1Q1pc5AjXd5TdVwy3a1fSYB2', 
+  fee_fraction: 0.05,
+  text: "Price of gold, 12AM UTC March1. 1=inc 2=dec/const", 
+  value: 2
+
+# Note that in this example, we're passing the private key that corresponds 
+# to the public key. This allows us to sign transactions without having to  
+# import the key onto the server's bitcoind. Note that this (currently) does 
+# pass the key to the counterpartyd server. This behavior may change in later
+# versions.
+tx_id = gold_down.save! 'cP7ufwcbZujaa1qkKthLbVZUaP88RS5r9awyXerJE5rAEMTRVmzc'
+
+puts "Gold was broadcast down in transaction  %s" % tx_id
+```
+
 ## Have questions?
-The *best* place to start is the [Counterparty API reference](https://github.com/CounterpartyXCP/counterpartyd/blob/master/docs/API.rst#read-api-function-reference).
+The _best_ place to start is the [Counterparty API reference](https://github.com/CounterpartyXCP/counterpartyd/blob/master/docs/API.rst#read-api-function-reference).
 You'll soon find that this gem is merely a wrapper around the official 
 counterpartyd json API.
 
 But, if that doesn't help tweet @derosetech and/or check the 
-(Counterparty Forums)[https://forums.counterparty.io/] for more help from the
+[Counterparty Forums](https://forums.counterparty.io/) for more help from the
 community. 
 
 We appreciate your patience if you're having problems, please bear in mind that 
