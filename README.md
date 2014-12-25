@@ -23,7 +23,7 @@ keep us updated on the apps you're building! We're working to make this
 counterparty spool-up process as simple as possible, so bear with us while we're
 setting everything up. 
 
-http://data.whicdn.com/images/24796384/tumblr_m0ng6rBeWT1qhd0xso1_500_large.jpg
+![Party On Wayne](http://data.whicdn.com/images/24796384/tumblr_m0ng6rBeWT1qhd0xso1_500_large.jpg)
 
 ## Examples
 Documentation on the objects is available via [rubydoc.info here](http://www.rubydoc.info/github/brighton36/counterparty_ruby/master), 
@@ -131,4 +131,4 @@ help from the community.
 We appreciate your patience if you're having problems, please bear in mind that 
 we're in active development mode. And thank-you for using Counterparty!
 
-http://www.quickmeme.com/img/c8/c8cc224c5b1e8b1baafeba4287d9534add53273bc79572a5fcc8ab8ab2cc19ab.jpg
+![Best Party Ever](http://www.quickmeme.com/img/c8/c8cc224c5b1e8b1baafeba4287d9534add53273bc79572a5fcc8ab8ab2cc19ab.jpg)
