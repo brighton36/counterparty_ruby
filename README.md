@@ -26,8 +26,9 @@ setting everything up.
 ![Party On Wayne](http://data.whicdn.com/images/24796384/tumblr_m0ng6rBeWT1qhd0xso1_500_large.jpg)
 
 ## Examples
-Documentation on the objects is available via [rubydoc.info here](http://www.rubydoc.info/github/brighton36/counterparty_ruby/master), 
-but a better guide to getting started is available on [counterparty's official API guide](https://github.com/CounterpartyXCP/counterpartyd/blob/master/docs/API.rst#read-api-function-reference).
+Documentation on the objects is available via:
+  * [counterparty_ruby's rubydoc](http://www.rubydoc.info/github/brighton36/counterparty_ruby/master), 
+  * [The Counterparty official API guide](https://github.com/CounterpartyXCP/counterpartyd/blob/master/docs/API.rst#read-api-function-reference).
 
 #### Find the first burn
 Here we retrieve burns from the blockchain using ActiveRecord style method calls.
