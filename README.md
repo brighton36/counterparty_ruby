@@ -108,6 +108,7 @@ an outcome to the network.
     source: 'msCXwsPVbv1Q1pc5AjXd5TdVwy3a1fSYB2', 
     fee_fraction: 0.05,
     text: "Price of gold, 12AM UTC March1. 1=inc 2=dec/const", 
+    timestamp: 1418926641, 
     value: 2 )
 
   # Note that in this example, we're passing the private key that corresponds 

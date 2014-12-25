@@ -103,12 +103,12 @@ module Counterparty
 
       # Returns the method name of a do_* request for this resource
       def to_do_request
-        'do_%s' % self.class.api_name
+        'do_%s' % api_name
       end
 
       # Returns the method name of a create_* request for this resource
-      def self.class.to_create_request
-        'create_%s' % self.class.api_name
+      def to_create_request
+        'create_%s' % api_name
       end
 
       # Returns the method name of a get_* request for this resource
