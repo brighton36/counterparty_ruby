@@ -2,23 +2,21 @@ PATH
   remote: .
   specs:
     counterparty_ruby (0.0.1)
+      bitcoin-ruby
+      ffi
       rest_client
 
 GEM
   remote: https://rubygems.org/
   specs:
-    bitcoin-client (0.0.3)
-      rest-client
+    bitcoin-ruby (0.0.6)
     diff-lcs (1.2.5)
+    ffi (1.9.6)
     json (1.8.1)
-    mime-types (2.4.3)
     netrc (0.7.9)
     rake (10.3.2)
     rdoc (4.2.0)
       json (~> 1.4)
-    rest-client (1.7.2)
-      mime-types (>= 1.16, < 3.0)
-      netrc (~> 0.7)
     rest_client (1.8.2)
       netrc (~> 0.7.7)
     rspec (3.1.0)
@@ -41,7 +39,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bitcoin-client
   counterparty_ruby!
   rake
   rdoc

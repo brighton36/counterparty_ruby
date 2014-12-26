@@ -16,10 +16,10 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 1.9'
   gem.license       = 'MIT'
 
-  ['rest_client'].each do |dependency|
+  ['rest_client', 'bitcoin-ruby', 'ffi'].each do |dependency|
     gem.add_runtime_dependency dependency
   end
-  ['rspec', 'rspec-its', 'rake', 'rdoc','bitcoin-client'].each do |dependency|
+  ['rspec', 'rspec-its', 'rake', 'rdoc'].each do |dependency|
     gem.add_development_dependency dependency
   end
 end

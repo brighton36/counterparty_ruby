@@ -1,5 +1,7 @@
 require 'json'
 require 'rest_client'
+require 'bitcoin'
+
 require 'counterparty/version'
 require 'counterparty/resource'
 require 'counterparty/resources'

@@ -70,8 +70,12 @@ module Counterparty
     # Currently this is communicating the request to the backend. This method
     # is a stub for when we decide in the future to Use the bitcoin-client gem
     # to perform signatures
-    def sign_tx(raw_tx, private_key)
-      connection.sign_tx raw_tx, private_key 
+    def sign_tx(raw_tx, pkey_wif)
+      puts "raw:"+raw_tx.inspect
+      key = ::Bitcoin.open_key(pkey_wif)
+      ret = Bitcoin.sign_data(key, raw_tx).unpack('h*').first
+      puts "Ret:"+ret.inspect
+      ret
     end
 
     def connection

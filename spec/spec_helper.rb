@@ -1,7 +1,7 @@
 $:<< File.join(File.dirname(__FILE__), '..','lib')
 
 require 'rspec/its'
-require 'bitcoin-client'
+#require 'bitcoin-client'
 require 'counterparty'
 
 BTC_CONNECTION = ['rpc', 'A4Xd7AQE4XIw0h', :host => 'localhost', :port => 18332 ]

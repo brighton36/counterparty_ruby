@@ -7,9 +7,10 @@ require 'spec_helper'
 describe Counterparty do
   before(:all) { Counterparty.test! }
 
-  it "Ensure test account has BTC" do
-    expect(bitcoin.getreceivedbyaddress(source_address)).to be > 0
-  end
+  # TODO: deprecate?
+  #it "Ensure test account has BTC" do
+    #expect(bitcoin.getreceivedbyaddress(source_address)).to be > 0
+  #end
 
   describe "Ensure test account has XCP" do
     subject do
@@ -60,7 +61,7 @@ describe Counterparty do
 
     it "should persist using a provided key" do
       begin 
-        # TODO: why is this failing...
+        # TODO: why is this failing... I think the key isn't in WIF format
         expect(subject.save!(source_privkey)).to_not be_empty
       rescue Counterparty::ResponseError => e
         puts e.inspect
