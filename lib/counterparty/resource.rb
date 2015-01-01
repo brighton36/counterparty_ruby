@@ -71,12 +71,71 @@ module Counterparty
     # is a stub for when we decide in the future to Use the bitcoin-client gem
     # to perform signatures
     def sign_tx(raw_tx, pkey_wif)
-      puts "raw:"+raw_tx.inspect
-      key = ::Bitcoin.open_key(pkey_wif)
-      ret = Bitcoin.sign_data(key, raw_tx).unpack('h*').first
+      key = ::Bitcoin.open_key pkey_wif
+
+      # This is screwy, but pulled from: 
+      # https://bitcoin.org/en/developer-reference#raw-transaction-format
+      ui32ver,bytes,ui32lock = $1, $2, $3 if /\A(.{2})(.+)(.{2})\Z/.match raw_tx.force_encoding('UTF-8')
+
+      # I think we need to inspect every char and encode them to pass to the Tx::new
+      puts "HUH: %s, %s, %s" % [ui32ver.inspect, bytes.inspect, ui32lock.inspect]
+      raw_tx_in_bytes = [ui32ver.hex].pack('V')+bytes.chars.collect(&:hex).pack('C')+[ui32lock.hex].pack('V')
+
+      puts "Raw:"+raw_tx_in_bytes.inspect
+
+      tx = Bitcoin::Protocol::Tx.new(raw_tx_in_bytes)
+
+      puts "To Json: %s" % tx.to_json.inspect
+      tx.inputs.each do |input|
+        puts "Input:"+input.inspect
+      end
+
+      
+      #puts "raw:"+raw_tx.inspect
+      #key = ::Bitcoin.open_key(pkey_wif)
+      #ret = Bitcoin.sign_data(key, raw_tx).unpack('h*').first
       puts "Ret:"+ret.inspect
       ret
     end
+
+=begin
+    def unserialize_raw_tx(raw_tx)
+      obj = {"ins": [], "outs": []}
+      obj["version"] = read_as_int(4)
+      ins = read_var_int()
+      for i in range(ins):
+          obj["ins"].append({
+              "outpoint": {
+                  "hash": read_bytes(32)[::-1],
+                  "index": read_as_int(4)
+              },
+              "script": read_var_string(),
+              "sequence": read_as_int(4)
+          })
+      outs = read_var_int()
+      for i in range(outs):
+          obj["outs"].append({
+              "value": read_as_int(8),
+              "script": read_var_string()
+          })
+      obj["locktime"] = read_as_int(4)
+      return obj
+
+    end
+def sign(tx, i, priv, hashcode=SIGHASH_ALL):                                    
+    i = int(i)                                                                  
+    if not re.match('^[0-9a-fA-F]*$', tx):                                      
+        return binascii.unhexlify(sign(binascii.hexlify(tx), i, priv))          
+    if len(priv) <= 33:                                                         
+        priv = binascii.hexlify(priv)                                           
+    pub = privkey_to_pubkey(priv)                                               
+    address = pubkey_to_address(pub)                                            
+    signing_tx = signature_form(tx, i, mk_pubkey_script(address), hashcode)     
+    sig = ecdsa_tx_sign(signing_tx, priv, hashcode)                             
+    txobj = deserialize(tx)                                                     
+    txobj["ins"][i]["script"] = serialize_script([sig, pub])                    
+    return serialize(txobj)                                                     
+=end
 
     def connection
       self.class.connection
