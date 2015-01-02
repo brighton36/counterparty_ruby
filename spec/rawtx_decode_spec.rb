@@ -15,18 +15,18 @@ describe RawTx do
     pending
   end
 
-  describe ".bytes_to_ui" do
+  describe ".nibbles_to_ui" do
     it "should fail on byte arrays larger than 32 bits" do
-      expect{ RawTx.bytes_to_ui([1,0,0,0,0]) }.to raise_error(ArgumentError)
+      expect{ RawTx.nibbles_to_ui([1,0,0,0,0]) }.to raise_error(ArgumentError)
     end
 
     # Remember that the least significant byte is first here:
-    it ("should convert 0x10 to 1") { expect(RawTx.bytes_to_ui([1,0])).to eq(1) }
-    it ("should convert 0x01 to 16") { expect(RawTx.bytes_to_ui([0,1])).to eq(16) }
-    it ("should convert 0xf to 15") { expect(RawTx.bytes_to_ui([0xf])).to eq(15) }
-    it ("should convert 0x11 to 17") { expect(RawTx.bytes_to_ui([1,1])).to eq(17) }
-    it ("should convert 0xf1 to 31") { expect(RawTx.bytes_to_ui([0xf,1])).to eq(31) }
-    it ("should convert 0xff to 255") { expect(RawTx.bytes_to_ui([0xf,0xf])).to eq(255) }
+    it ("should convert 0x10 to 1") { expect(RawTx.nibbles_to_ui([1,0])).to eq(1) }
+    it ("should convert 0x01 to 16") { expect(RawTx.nibbles_to_ui([0,1])).to eq(16) }
+    it ("should convert 0xf to 15") { expect(RawTx.nibbles_to_ui([0xf])).to eq(15) }
+    it ("should convert 0x11 to 17") { expect(RawTx.nibbles_to_ui([1,1])).to eq(17) }
+    it ("should convert 0xf1 to 31") { expect(RawTx.nibbles_to_ui([0xf,1])).to eq(31) }
+    it ("should convert 0xff to 255") { expect(RawTx.nibbles_to_ui([0xf,0xf])).to eq(255) }
   end
   
   describe ".bytes_to_base64_s" do
@@ -47,6 +47,7 @@ describe RawTx do
   end
 
   describe "#to_hash" do
+=begin
     let(:tx_json) do 
       # This was pulled from: https://brainwallet.github.io/#tx
       { hash: "70b1da7516c70608de9a312002a4b6c7e376948164542953d5c1949a66866a6f",
@@ -70,6 +71,7 @@ describe RawTx do
         ]
       }
     end
+=end
 
     subject{ RawTx.new(
       "0100000001ec549bdf53cfb319201d672fc0933500e48505724010dad615a9344b99" +
@@ -83,50 +85,51 @@ describe RawTx do
       "7fd34bde19cf64ad9302e454c4c377677581a951579a124b86e753aec0ba770d0000" +
       "00001976a9148025b288cb325d88bcd7ef5d1ab1f8827778d5ee88ac00000000").to_hash }
 
-    its([:ver]){should eq(1)}
-    its([:lock_time]){should eq(0)}
-    its([:size]){should eq(338)}
-    its([:vin_sz]){should eq(1)}
-    its([:vout_sz]){should eq(3)}
+    its(['ver']){should eq(1)}
+    its(['lock_time']){should eq(0)}
+    its(['size']){should eq(338)}
+    its(['vin_sz']){should eq(1)}
+    its(['vout_sz']){should eq(3)}
 
-    its([:in]) do 
-      out_hash = tx_json[:in][0][:prev_out][:hash]
-      out_hash_base64 = RawTx.bytes_to_base64_s(out_hash.scan(/../).collect(&:hex))
+    its(['in']) do 
+      # If we're testing to base64, the hash would look like:
+      # RawTx.bytes_to_base64_s(out_hash.scan(/../).collect(&:hex))
 
       should eq([{
-        outpoint: { hash: "cc2117994b34a915d6da1040720585e4003593c02f671d2019b3cf53df9b54ec",
-           index: 1}, 
-        script: [118, 169, 20, 128, 37, 178, 136, 203, 50, 93, 136, 188, 215, 
-          239, 93, 26, 177, 248, 130, 119, 120, 213, 238, 136, 172],
+        'prev_out' => { 'hash' => "cc2117994b34a915d6da1040720585e4003593c02f671d2019b3cf53df9b54ec",
+           'n' => 1}, 
+        'scriptSig' => %w(OP_DUP OP_HASH160 8025b288cb325d88bcd7ef5d1ab1f8827778d5ee 
+          OP_EQUALVERIFY OP_CHECKSIG).join(' '),
         # NOTE: The :seq field isnt actually used right now, so some rawtx decoders
-        # return the varint (like decoder), and some return UINT_MAX
-        seq: 1114095}] )
+        # return the varint (like decoder), and some return UINT_MAX (4294967295)
+        'seq' => 1114095}] )
     end
 
-    its([:out]) do 
+    its(['out']) do 
+      # NOTE that 1 == OP_TRUE , but for some reason that's not a universal thing
+      # Likewise 3 == OP_THREE
       should eq( [ 
-        { :value=>[120, 30, 0, 0, 0, 0, 0, 0], :script=>[81, 33, 2, 134, 205, 
-          249, 236, 135, 66, 196, 82, 189, 19, 41, 151, 113, 254, 64, 19, 1, 36, 
-          3, 142, 33, 152, 255, 196, 2, 32, 76, 72, 204, 45, 50, 218, 33, 3, 61, 
-          224, 223, 21, 85, 232, 23, 131, 244, 46, 0, 69, 141, 11, 84, 47, 242, 
-          147, 217, 208, 79, 188, 119, 4, 101, 4, 72, 238, 7, 114, 138, 138, 33, 
-          2, 134, 177, 228, 241, 93, 229, 127, 211, 75, 222, 25, 207, 100, 173, 
-          147, 2, 228, 84, 196, 195, 119, 103, 117, 129, 169, 81, 87, 154, 18, 
-          75, 134, 231, 83, 174]}, 
-        { :value=>[120, 30, 0, 0, 0, 0, 0, 0], :script=>[81, 33, 2, 162, 205, 
-          249, 236, 135, 66, 196, 82, 189, 34, 20, 254, 1, 201, 243, 59, 13, 0, 
-          102, 237, 14, 251, 144, 170, 113, 84, 0, 3, 140, 28, 98, 25, 33, 3, 
-          79, 137, 188, 112, 117, 135, 113, 163, 147, 65, 108, 33, 161, 43, 101, 
-          29, 179, 222, 249, 133, 27, 255, 87, 73, 4, 118, 43, 134, 54, 92, 170, 
-          234, 33, 2, 134, 177, 228, 241, 93, 229, 127, 211, 75, 222, 25, 207, 
-          100, 173, 147, 2, 228, 84, 196, 195, 119, 103, 117, 129, 169, 81, 87, 
-          154, 18, 75, 134, 231, 83, 174]}, 
-        { :value=>[192, 186, 119, 13, 0, 0, 0, 0], :script=>[118, 169, 20, 128, 
-          37, 178, 136, 203, 50, 93, 136, 188, 215, 239, 93, 26, 177, 248, 130, 
-          119, 120, 213, 238, 136, 172]}]
+        { 'value' => "0.00007800", 
+          'scriptPubKey' => "1 0286cdf9ec8742c452bd13299771fe40130124038e2198ffc402204c48cc2d32da 033de0df1555e81783f42e00458d0b542ff293d9d04fbc7704650448ee07728a8a 0286b1e4f15de57fd34bde19cf64ad9302e454c4c377677581a951579a124b86e7 3 OP_CHECKMULTISIG" }, 
+        { 'value'=> "0.00007800", 
+          'scriptPubKey' => "1 02a2cdf9ec8742c452bd2214fe01c9f33b0d0066ed0efb90aa715400038c1c6219 034f89bc70758771a393416c21a12b651db3def9851bff574904762b86365caaea 0286b1e4f15de57fd34bde19cf64ad9302e454c4c377677581a951579a124b86e7 3 OP_CHECKMULTISIG" }, 
+        { 'value' => "2.25950400",
+          'scriptPubKey' => 'OP_DUP OP_HASH160 8025b288cb325d88bcd7ef5d1ab1f8827778d5ee OP_EQUALVERIFY OP_CHECKSIG' }]
       )
     end
   end
+ 
+  describe("#to_hash coinbase") do
+
+    subject{ RawTx.new(
+      "01000000010000000000000000000000000000000000000000000000000000000000" + 
+      "000000ffffffff53038349040d00456c69676975730052d8f72ffabe6d6dd991088d" + 
+      "ecd13e658bbecc0b2b4c87306f637828917838c02a5d95d0e1bdff9b040000000000" +
+      "0000002f73733331312f00906b570400000000e4050000ffffffff01bf2087950000" +
+      "00001976a9145399c3093d31e4b0af4be1215d59b857b861ad5d88ac00000000").to_hash }
+
+    pending
+  end 
 
 end
 

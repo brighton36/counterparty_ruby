@@ -16,12 +16,6 @@ class RawTx
     bytes = @hexstring.scan(/../).collect(&:hex)
     size = bytes.length
 
-    # Double sha256 is your hash:
-    #hash = Digest::SHA2.new.update(Digest::SHA2.new.update(
-      #"".tap {|binary| @hexstring.scan(/../) {|hn| binary << hn.to_i(16).chr}}
-
-    #).to_s).to_s
-
     # Now we start shift elements off the byte stack:
     version = shift_u32(bytes)
 
@@ -29,34 +23,46 @@ class RawTx
 
     # Parse the inputs:
     ins = (0...shift_varint(bytes)).collect do
-      { outpoint: {
-          # TODO: Put this in an options{}
-          #hash: self.class.bytes_to_base64_s(bytes.slice!(0,32).reverse),
-          hash: bytes.slice!(0,32).reverse.collect{|n| '%02x' % n}.join,
-          index: shift_u32(bytes) },
-        script: shift_varchar(bytes),
-        seq: shift_u32(bytes) }
+      hash = bytes.slice!(0,32).reverse.collect{|n| '%02x' % n}.join
+      index,script,seq = shift_u32(bytes),shift_varchar(bytes),shift_u32(bytes)
+
+      # NOTE: We may want to base64 encode the hash, or support this via an 
+      # option : self.class.bytes_to_base64_s(hash).reverse),
+      { 'prev_out' => { 'hash' => hash, 'n' => index },
+        'scriptSig' => disassemble_script(script), 'seq' => seq }
     end
 
-    # Parse outputs TODO: Collect these
+    # Parse outputs:
     outs = (0...shift_varint(bytes)).collect do
-      { value: shift_u64(bytes), script: shift_varchar(bytes) }
+      value, script = shift_u64(bytes), shift_varchar(bytes)
+
+      { 'value' => "%.8f" % [self.class.bytes_to_ui(value).to_f/1e8], 
+        'scriptPubKey' => disassemble_script(script) }
     end
 
     lock_time = shift_u32 bytes
 
-    {in: ins, out: outs, lock_time: lock_time, ver: version, 
-      vin_sz: ins.length, vout_sz: outs.length, size: size}
+    {'in' => ins, 'out' => outs, 'lock_time' => lock_time, 'ver' => version, 
+      'vin_sz' => ins.length, 'vout_sz' => outs.length, 'size' => size}
   end
 
-  # Parse an bytearray, works for numbers up to 32-bit only
-  def self.bytes_to_ui(bytes)
-    raise ArgumentError if bytes.length > 4
+  # Convert an array of 4 bit numbers into an unsigned int, 
+  # works for numbers up to 32-bit only
+  def self.nibbles_to_ui(nibbles)
+    raise ArgumentError if nibbles.length > 4
 
-    bytes.each_with_index.inject(0){ |sum, (b,i)|
+    nibbles.each_with_index.inject(0){ |sum, (b,i)|
       sum += (b.to_i & 0xff) << (4 * i) }
   end
 
+  # Convert an array of 8 bit numbers into an unsigned int,
+  # Remember that for each input byte, the most significant nibble comes last.
+  def self.bytes_to_ui(bytes)
+    nibbles = bytes.collect{|b| [b & 0x0f, b >> 4]}.flatten
+    nibbles.each_with_index.inject(0){|sum,(b,i)| sum += b * 16**i}
+  end
+
+  # Convert an array of bytes to a base64 string.
   def self.bytes_to_base64_s(input_bytes)
     input_bytes.each_slice(3).collect.with_index{ |bytes,i|
       # This is the base offset of this 3-byte slice in the sequence:
@@ -74,6 +80,13 @@ class RawTx
   end
 
   private 
+
+  def disassemble_script(bytes)
+    # We don't actually need to reference a hash argument to acheive disassembly:
+    btc_script = Bitcoin::Script.new String.new
+    chunks = btc_script.parse bytes.pack('C*')
+    btc_script.to_string chunks
+  end
 
   # https://en.bitcoin.it/wiki/Protocol_specification#Variable_length_string
   def shift_varchar(bytes)
@@ -95,7 +108,7 @@ class RawTx
   # above:
   [1,2,4].each do |n|
     define_method('shift_u%s' % [n*8]) do |bytes| 
-      self.class.bytes_to_ui bytes.slice!(0,n)
+      self.class.nibbles_to_ui bytes.slice!(0,n)
     end
   end
 

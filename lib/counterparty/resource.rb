@@ -72,48 +72,12 @@ module Counterparty
     # to perform signatures
     def sign_tx(raw_tx, pkey_wif)
       key = ::Bitcoin.open_key pkey_wif
-
       raw_tx_hash = RawTx.new(raw_tx).to_hash
-      puts "Raw:"+raw_tx_hash.inspect
-      tx = Bitcoin::Protocol::Tx.from_hash(raw_tx_hash)
 
-      puts "To Json: %s" % tx.to_json.inspect
-      tx.inputs.each do |input|
-        puts "Input:"+input.inspect
-      end
-
-      
-      #puts "raw:"+raw_tx.inspect
-      #key = ::Bitcoin.open_key(pkey_wif)
-      #ret = Bitcoin.sign_data(key, raw_tx).unpack('h*').first
-      puts "Ret:"+ret.inspect
-      ret
-    end
-
+      # We need to compare against
+      # Primarily: http://www.righto.com/2014/02/bitcoins-hard-way-using-raw-bitcoin.html
+      # With Some of this: https://bitcoin.org/en/developer-reference#signrawtransaction
 =begin
-    def unserialize_raw_tx(raw_tx)
-      obj = {"ins": [], "outs": []}
-      obj["version"] = read_as_int(4)
-      ins = read_var_int()
-      for i in range(ins):
-          obj["ins"].append({
-              "outpoint": {
-                  "hash": read_bytes(32)[::-1],
-                  "index": read_as_int(4)
-              },
-              "script": read_var_string(),
-              "sequence": read_as_int(4)
-          })
-      outs = read_var_int()
-      for i in range(outs):
-          obj["outs"].append({
-              "value": read_as_int(8),
-              "script": read_var_string()
-          })
-      obj["locktime"] = read_as_int(4)
-      return obj
-
-    end
 def sign(tx, i, priv, hashcode=SIGHASH_ALL):                                    
     i = int(i)                                                                  
     if not re.match('^[0-9a-fA-F]*$', tx):                                      
@@ -128,6 +92,17 @@ def sign(tx, i, priv, hashcode=SIGHASH_ALL):
     txobj["ins"][i]["script"] = serialize_script([sig, pub])                    
     return serialize(txobj)                                                     
 =end
+
+      
+      scriptSig = Bitcoin.sign_data(key, 
+        raw_tx_hash["in"][0]["scriptSig"] ).unpack('h*').first
+      # TODO: We may have to iterate over each input
+      raw_tx_hash["in"][0]["scriptSig"] = scriptSig
+
+      ret = Bitcoin::Protocol::Tx.from_hash(raw_tx_hash).to_payload.unpack('h*').first
+
+      ret
+    end
 
     def connection
       self.class.connection
