@@ -46,8 +46,9 @@ describe RawTx do
     end
   end
 
-  describe "#to_json" do
+  describe "#to_hash" do
     let(:tx_json) do 
+      # This was pulled from: https://brainwallet.github.io/#tx
       { hash: "70b1da7516c70608de9a312002a4b6c7e376948164542953d5c1949a66866a6f",
         ver: 1, vin_sz: 1, vout_sz: 3, lock_time: 0,
         size: 338, 
@@ -80,7 +81,7 @@ describe RawTx do
       "c452bd2214fe01c9f33b0d0066ed0efb90aa715400038c1c621921034f89bc707587" +
       "71a393416c21a12b651db3def9851bff574904762b86365caaea210286b1e4f15de5" +
       "7fd34bde19cf64ad9302e454c4c377677581a951579a124b86e753aec0ba770d0000" +
-      "00001976a9148025b288cb325d88bcd7ef5d1ab1f8827778d5ee88ac00000000").to_json }
+      "00001976a9148025b288cb325d88bcd7ef5d1ab1f8827778d5ee88ac00000000").to_hash }
 
     its([:ver]){should eq(1)}
     its([:lock_time]){should eq(0)}

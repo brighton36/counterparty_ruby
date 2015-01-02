@@ -73,17 +73,9 @@ module Counterparty
     def sign_tx(raw_tx, pkey_wif)
       key = ::Bitcoin.open_key pkey_wif
 
-      # This is screwy, but pulled from: 
-      # https://bitcoin.org/en/developer-reference#raw-transaction-format
-      ui32ver,bytes,ui32lock = $1, $2, $3 if /\A(.{2})(.+)(.{2})\Z/.match raw_tx.force_encoding('UTF-8')
-
-      # I think we need to inspect every char and encode them to pass to the Tx::new
-      puts "HUH: %s, %s, %s" % [ui32ver.inspect, bytes.inspect, ui32lock.inspect]
-      raw_tx_in_bytes = [ui32ver.hex].pack('V')+bytes.chars.collect(&:hex).pack('C')+[ui32lock.hex].pack('V')
-
-      puts "Raw:"+raw_tx_in_bytes.inspect
-
-      tx = Bitcoin::Protocol::Tx.new(raw_tx_in_bytes)
+      raw_tx_hash = RawTx.new(raw_tx).to_hash
+      puts "Raw:"+raw_tx_hash.inspect
+      tx = Bitcoin::Protocol::Tx.from_hash(raw_tx_hash)
 
       puts "To Json: %s" % tx.to_json.inspect
       tx.inputs.each do |input|

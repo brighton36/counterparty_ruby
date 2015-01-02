@@ -1,4 +1,6 @@
 # This class is mostly used to decode json transactions from raw transactions
+# much of this implementation was inspired from: 
+# https://gist.github.com/shesek/5835695
 class RawTx
   # This is a map of offset to characters used for decoding base64 strings:
   BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
@@ -10,7 +12,7 @@ class RawTx
   end
 
   # Returns this transaction in a standard json format
-  def to_json(options = {})
+  def to_hash(options = {})
     bytes = @hexstring.scan(/../).collect(&:hex)
     size = bytes.length
 
