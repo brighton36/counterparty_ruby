@@ -5,46 +5,53 @@ class RawTx
 
   # Creates a raw transaction from a hexstring
   def initialize(as_hexstring)
-    @hexstring = as_hexstring
+    @hexstring = as_hexstring.downcase
+    raise ArgumentError, "Unsupported hex" unless /\A[0-9a-f]+\Z/.match @hexstring
   end
 
   # Returns this transaction in a standard json format
-  def to_json
-    #TODO: These are words, not bytes
-    bytes = @hexstring.chars.collect(&:hex)
-    version = slice_u32(bytes)
+  def to_json(options = {})
+    bytes = @hexstring.scan(/../).collect(&:hex)
+    size = bytes.length
+
+    # Double sha256 is your hash:
+    #hash = Digest::SHA2.new.update(Digest::SHA2.new.update(
+      #"".tap {|binary| @hexstring.scan(/../) {|hn| binary << hn.to_i(16).chr}}
+
+    #).to_s).to_s
+
+    # Now we start shift elements off the byte stack:
+    version = shift_u32(bytes)
 
     raise ArgumentError, "Unsupported Version/Tx" unless version == 0x01
 
-    # Parse inputs TODO: Collect these
-    in_count = slice_varint bytes
-    ins = []
-    0.upto(in_count) do
-      ins << { outpoint: {
-          hash: self.class.bytes_to_base64_s(bytes.slice(32)),
-          index: slice_u32(bytes) },
-        script: slice_varchar(bytes),
-        seq: slice_u32(bytes) }
+    # Parse the inputs:
+    ins = (0...shift_varint(bytes)).collect do
+      { outpoint: {
+          # TODO: Put this in an options{}
+          #hash: self.class.bytes_to_base64_s(bytes.slice!(0,32).reverse),
+          hash: bytes.slice!(0,32).reverse.collect{|n| '%02x' % n}.join,
+          index: shift_u32(bytes) },
+        script: shift_varchar(bytes),
+        seq: shift_u32(bytes) }
     end
 
     # Parse outputs TODO: Collect these
-    out_count = slice_varint bytes
-    outs = []
-    0.upto(out_count) do
-      outs << { value: slice_u64(bytes), script: slice_varchar(bytes) }
+    outs = (0...shift_varint(bytes)).collect do
+      { value: shift_u64(bytes), script: shift_varchar(bytes) }
     end
 
-    lock_time = slice_u32 bytes
+    lock_time = shift_u32 bytes
 
-    {in: ins, out: outs, lock_time: lock_time, ver: version, vin_sz: ins.length,
-     vout_sz: outs.length, lock_time: nil, size: nil}
+    {in: ins, out: outs, lock_time: lock_time, ver: version, 
+      vin_sz: ins.length, vout_sz: outs.length, size: size}
   end
 
   # Parse an bytearray, works for numbers up to 32-bit only
   def self.bytes_to_ui(bytes)
     raise ArgumentError if bytes.length > 4
 
-    bytes.reverse.each_with_index.inject(0){ |sum, (b,i)|
+    bytes.each_with_index.inject(0){ |sum, (b,i)|
       sum += (b.to_i & 0xff) << (4 * i) }
   end
 
@@ -62,36 +69,36 @@ class RawTx
           BASE64_CHARS[((triplet >> 6 * (3 - j)) & 0x3F)] : '=' 
       end
     }.join
-
   end
 
   private 
 
   # https://en.bitcoin.it/wiki/Protocol_specification#Variable_length_string
-  def slice_varchar(bytes)
-    bytes.slice slice_varint(bytes)
+  def shift_varchar(bytes)
+    bytes.slice! 0, shift_varint(bytes)
   end
 
   # https://en.bitcoin.it/wiki/Protocol_specification#Variable_length_integer
-  def slice_varint(bytes)
-    n = slice_u8 bytes
+  def shift_varint(bytes)
+    n = shift_u8 bytes
     case n
-      when 0xfd then slice_u16 bytes
-      when 0xfe then slice_u32 bytes
-      when 0xff then slice_u64 bytes
+      when 0xfd then shift_u16 bytes
+      when 0xfe then shift_u32 bytes
+      when 0xff then shift_u64 bytes
       else n
     end
   end
   
-  # TODO: Maybe make thsi a bit more dry/introspective with an itereator over power
-  # s of two
-  def slice_u8(bytes); self.class.bytes_to_ui bytes.slice(1); end
-  def slice_u16(bytes); self.class.bytes_to_ui bytes.slice(2); end
-  def slice_u32(bytes); self.class.bytes_to_ui bytes.slice(4); end
-  #def slice_u64(bytes); self.class.bytes_to_ui bytes.slice(8); end
+  # These are numeric byte-shift short-cuts that make for more readable code 
+  # above:
+  [1,2,4].each do |n|
+    define_method('shift_u%s' % [n*8]) do |bytes| 
+      self.class.bytes_to_ui bytes.slice!(0,n)
+    end
+  end
 
-  # TODO: This wise? 64 bit numbers are kept as bytes
-  # (bitcoinjs-lib expects them that way)
-  def slice_u64(bytes); bytes.slice(8); end
-
+  # 64 bit requests are an exception, and kept as 8-byte arrays:
+  def shift_u64(bytes)
+    bytes.slice!(0,8)
+  end
 end
