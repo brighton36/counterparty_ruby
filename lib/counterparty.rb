@@ -2,6 +2,7 @@ require 'json'
 require 'rest_client'
 require 'bitcoin'
 
+require 'counterparty/raw_tx'
 require 'counterparty/version'
 require 'counterparty/resource'
 require 'counterparty/resources'
