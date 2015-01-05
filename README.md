@@ -33,7 +33,7 @@ Documentation on the objects is available via:
 #### Find the first burn
 Here we retrieve burns from the blockchain using ActiveRecord style method calls.
   ```ruby
-  gem 'counterparty_ruby'
+  require 'counterparty_ruby'
 
   Counterparty.production!
 
@@ -48,7 +48,7 @@ Here we retrieve burns from the blockchain using ActiveRecord style method calls
 This example achieves the same outcome as the above example, but uses a more 
 json-esque call syntax.
   ```ruby
-  gem 'counterparty_ruby'
+  require 'counterparty_ruby'
 
   # This connects to production mode on localhost:
   production = Counterparty.connection.new 4000
@@ -64,7 +64,7 @@ json-esque call syntax.
 #### Create an Issuance
 Here we create an asset and persist that asset intothe blockchain using ActiveRecord style method calls.
   ```ruby
-  gem 'counterparty_ruby'
+  require 'counterparty_ruby'
 
   # Note that we default to test mode. Too, this example requires that your 
   # private key for this address exists in the counterparty server's bitcoind 
@@ -84,7 +84,7 @@ Here we create an asset and persist that asset intothe blockchain using ActiveRe
 This example achieves the same outcome as the above example, but uses a more 
 json-esque call syntax.
   ```ruby
-  gem 'counterparty_ruby'
+  require 'counterparty_ruby'
 
   # Note that we default to test mode. Too, this example requires that your 
   # private key for this address exists in the counterparty server's bitcoind 
@@ -102,7 +102,7 @@ json-esque call syntax.
 If you're the oracle, tasked with resolving a bet, here's how you would announce
 an outcome to the network.
   ```ruby
-  gem 'counterparty_ruby'
+  require 'counterparty_ruby'
 
   gold_down = Counterparty::Broadcast.new(
     source: 'msCXwsPVbv1Q1pc5AjXd5TdVwy3a1fSYB2', 
@@ -119,6 +119,60 @@ an outcome to the network.
   tx_id = gold_down.save! 'cP7ufwcbZujaa1qkKthLbVZUaP88RS5r9awyXerJE5rAEMTRVmzc'
 
   puts "Gold was broadcast down in transaction  %s" % tx_id
+  ```
+
+#### Compile, Publish and execute a Serpent Contract
+This is still beta behavior, and only supported on testnet, but here's a quick
+example of how Smart Contracts are published and executed. Note that we require
+the serpent CLI executable is installed on the running system
+  ```ruby
+  require 'open3'
+  require 'counterparty'
+
+  SOURCE_ADDRESS="msCXwsPVbv1Q1pc5AjXd5TdVwy3a1fSYB2"
+
+  Counterparty.test!
+
+  class Serpent
+    SERPENT='/usr/local/bin/serpent'
+
+    def compile(contract)
+      serpent 'compile', '-s', :stdin_data => contract
+    end
+
+    def encode_datalist(data)
+      serpent 'encode_datalist', data
+    end
+
+    private
+
+    def serpent(*args)
+      options = (args.last.kind_of? Hash) ? args.pop : {}
+      stdout, status = Open3.capture2( ([SERPENT]+args).join(' '), options)
+
+      raise StandardError, "Compile Failed: %s" % status.exitstatus unless status.success?
+
+      stdout.chomp
+    end
+  end
+
+  serpent = Serpent.new
+
+  compiled_script = serpent.compile <<-eos
+    return(msg.data[0]*2)
+  eos
+
+  contract_id = Counterparty::Publish.new( source: SOURCE_ADDRESS, 
+    code_hex: compiled_script, gasprice: 1, startgas: 1000000, endowment: 0, 
+    allow_unconfirmed_inputs: true ).save!
+
+  datalist = serpent.encode_datalist '53'
+
+  execute_id = Counterparty::Execute.new( source: SOURCE_ADDRESS, 
+    contract_id: contract_id, payload_hex: datalist, gasprice: 5, 
+    startgas: 160000, value: 10, allow_unconfirmed_inputs: true ).save!
+
+  puts "Executed Transaction ID: %s" % execute_id
   ```
 
 ## Have questions?

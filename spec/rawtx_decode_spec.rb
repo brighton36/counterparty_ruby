@@ -47,32 +47,8 @@ describe RawTx do
   end
 
   describe "#to_hash" do
-=begin
-    let(:tx_json) do 
-      # This was pulled from: https://brainwallet.github.io/#tx
-      { hash: "70b1da7516c70608de9a312002a4b6c7e376948164542953d5c1949a66866a6f",
-        ver: 1, vin_sz: 1, vout_sz: 3, lock_time: 0,
-        size: 338, 
-        in: [
-          { prev_out: {
-            hash: "cc2117994b34a915d6da1040720585e4003593c02f671d2019b3cf53df9b54ec",
-            n: 1 },
-            scriptSig: "OP_DUP OP_HASH160 8025b288cb325d88bcd7ef5d1ab1f8827778d5ee OP_EQUALVERIFY OP_CHECKSIG",
-            sequence: 4294967295
-          }
-        ], 
-        out: [ 
-          { value: "0.00007800",
-            scriptPubKey: "OP_TRUE 0286cdf9ec8742c452bd13299771fe40130124038e2198ffc402204c48cc2d32da 033de0df1555e81783f42e00458d0b542ff293d9d04fbc7704650448ee07728a8a 0286b1e4f15de57fd34bde19cf64ad9302e454c4c377677581a951579a124b86e7 OP_3 OP_CHECKMULTISIG" },
-            { value: "0.00007800",
-              scriptPubKey: "OP_TRUE 02a2cdf9ec8742c452bd2214fe01c9f33b0d0066ed0efb90aa715400038c1c6219 034f89bc70758771a393416c21a12b651db3def9851bff574904762b86365caaea 0286b1e4f15de57fd34bde19cf64ad9302e454c4c377677581a951579a124b86e7 OP_3 OP_CHECKMULTISIG" },
-            { value: "2.25950400",
-              scriptPubKey: "OP_DUP OP_HASH160 8025b288cb325d88bcd7ef5d1ab1f8827778d5ee OP_EQUALVERIFY OP_CHECKSIG" }
-        ]
-      }
-    end
-=end
-
+    # NOTE that these spec values were obtained via:
+    # bitcoind -testnet decoderawtransaction [subject]
     subject{ RawTx.new(
       "0100000001ec549bdf53cfb319201d672fc0933500e48505724010dad615a9344b99" +
       "1721cc010000001976a9148025b288cb325d88bcd7ef5d1ab1f8827778d5ee88acff" +
@@ -91,31 +67,36 @@ describe RawTx do
     its(['vin_sz']){should eq(1)}
     its(['vout_sz']){should eq(3)}
 
-    its(['in']) do 
+    its(['vin']) do 
       # If we're testing to base64, the hash would look like:
       # RawTx.bytes_to_base64_s(out_hash.scan(/../).collect(&:hex))
-
-      should eq([{
-        'prev_out' => { 'hash' => "cc2117994b34a915d6da1040720585e4003593c02f671d2019b3cf53df9b54ec",
-           'n' => 1}, 
-        'scriptSig' => %w(OP_DUP OP_HASH160 8025b288cb325d88bcd7ef5d1ab1f8827778d5ee 
-          OP_EQUALVERIFY OP_CHECKSIG).join(' '),
-        # NOTE: The :seq field isnt actually used right now, so some rawtx decoders
-        # return the varint (like decoder), and some return UINT_MAX (4294967295)
-        'seq' => 1114095}] )
+      should eq([
+          { "txid" => "cc2117994b34a915d6da1040720585e4003593c02f671d2019b3cf53df9b54ec",
+            "vout" => 1,
+            "scriptSig" => {
+              "hex" => "76a9148025b288cb325d88bcd7ef5d1ab1f8827778d5ee88ac"
+            }, "sequence" => 4294967295 }])
     end
 
-    its(['out']) do 
-      # NOTE that 1 == OP_TRUE , but for some reason that's not a universal thing
-      # Likewise 3 == OP_THREE
+    its(['vout']) do 
       should eq( [ 
-        { 'value' => "0.00007800", 
-          'scriptPubKey' => "1 0286cdf9ec8742c452bd13299771fe40130124038e2198ffc402204c48cc2d32da 033de0df1555e81783f42e00458d0b542ff293d9d04fbc7704650448ee07728a8a 0286b1e4f15de57fd34bde19cf64ad9302e454c4c377677581a951579a124b86e7 3 OP_CHECKMULTISIG" }, 
-        { 'value'=> "0.00007800", 
-          'scriptPubKey' => "1 02a2cdf9ec8742c452bd2214fe01c9f33b0d0066ed0efb90aa715400038c1c6219 034f89bc70758771a393416c21a12b651db3def9851bff574904762b86365caaea 0286b1e4f15de57fd34bde19cf64ad9302e454c4c377677581a951579a124b86e7 3 OP_CHECKMULTISIG" }, 
-        { 'value' => "2.25950400",
-          'scriptPubKey' => 'OP_DUP OP_HASH160 8025b288cb325d88bcd7ef5d1ab1f8827778d5ee OP_EQUALVERIFY OP_CHECKSIG' }]
-      )
+        { "value" => 0.00007800, "n" => 0,
+          "scriptPubKey" => {
+            "hex" => "51210286cdf9ec8742c452bd13299771fe40130124038e2198ffc40"+
+              "2204c48cc2d32da21033de0df1555e81783f42e00458d0b542ff293d9d04f"+
+              "bc7704650448ee07728a8a210286b1e4f15de57fd34bde19cf64ad9302e45"+
+              "4c4c377677581a951579a124b86e753ae" }
+        },
+        { "value" => 0.00007800, "n" => 1,
+          "scriptPubKey" => {
+            "hex" => "512102a2cdf9ec8742c452bd2214fe01c9f33b0d0066ed0efb90aa71"+
+              "5400038c1c621921034f89bc70758771a393416c21a12b651db3def9851bf"+
+              "f574904762b86365caaea210286b1e4f15de57fd34bde19cf64ad9302e454"+
+              "c4c377677581a951579a124b86e753ae" }
+        },
+        { "value" => 2.25950400, "n" => 2,
+          "scriptPubKey" => {
+            "hex" => "76a9148025b288cb325d88bcd7ef5d1ab1f8827778d5ee88ac" } } ] )
     end
   end
  

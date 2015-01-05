@@ -1,28 +1,21 @@
 $:<< File.join(File.dirname(__FILE__), '..','lib')
 
+require 'yaml'
 require 'rspec/its'
-#require 'bitcoin-client'
 require 'counterparty'
 
-BTC_CONNECTION = ['rpc', 'A4Xd7AQE4XIw0h', :host => 'localhost', :port => 18332 ]
-SOURCE_ADDRESS = "msCXwsPVbv1Q1pc5AjXd5TdVwy3a1fSYB2" 
-SOURCE_PRIVKEY = "cP7ufwcbZujaa1qkKthLbVZUaP88RS5r9awyXerJE5rAEMTRVmzc"
-DESTINATION_ADDRESS = "msj42CCGruhRsFrGATiUuh25dtxYtnpbTx"
+@config = YAML.load File.open([File.dirname(__FILE__),'config.yml'].join('/')).read
 
 def source_address
-  SOURCE_ADDRESS
+  @config['source_address']
 end
 
 def source_privkey
-  SOURCE_PRIVKEY
-end
-
-def bitcoin
-  Bitcoin::Client.new *BTC_CONNECTION
+  @config['source_privkey']
 end
 
 def destination_address
-  DESTINATION_ADDRESS
+  @config['destination_address']
 end
 
 # Since asset names have to be unique, we try our best to create a unique

@@ -5,6 +5,8 @@ class RawTx
   # This is a map of offset to characters used for decoding base64 strings:
   BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
+  MAX_32BIT_INTEGER=2**32-1
+
   # Creates a raw transaction from a hexstring
   def initialize(as_hexstring)
     @hexstring = as_hexstring.downcase
@@ -28,21 +30,24 @@ class RawTx
 
       # NOTE: We may want to base64 encode the hash, or support this via an 
       # option : self.class.bytes_to_base64_s(hash).reverse),
-      { 'prev_out' => { 'hash' => hash, 'n' => index },
-        'scriptSig' => disassemble_script(script), 'seq' => seq }
+
+      # NOTE: The :seq field isnt actually used right now, so some rawtx decoders
+      # return the varint (like decoder), and some return UINT_MAX (4294967295)
+      { 'txid' => hash, 'vout' => index, 'sequence' => MAX_32BIT_INTEGER,
+        'scriptSig' => {'hex' => hex_stringify(script) } }
     end
 
     # Parse outputs:
-    outs = (0...shift_varint(bytes)).collect do
+    outs = (0...shift_varint(bytes)).collect do |i|
       value, script = shift_u64(bytes), shift_varchar(bytes)
 
-      { 'value' => "%.8f" % [self.class.bytes_to_ui(value).to_f/1e8], 
-        'scriptPubKey' => disassemble_script(script) }
+      { 'value' => self.class.bytes_to_ui(value).to_f/1e8, 'n' => i, 
+        'scriptPubKey' => {'hex' => hex_stringify(script) } }
     end
 
     lock_time = shift_u32 bytes
 
-    {'in' => ins, 'out' => outs, 'lock_time' => lock_time, 'ver' => version, 
+    {'vin' => ins, 'vout' => outs, 'lock_time' => lock_time, 'ver' => version, 
       'vin_sz' => ins.length, 'vout_sz' => outs.length, 'size' => size}
   end
 
@@ -81,11 +86,8 @@ class RawTx
 
   private 
 
-  def disassemble_script(bytes)
-    # We don't actually need to reference a hash argument to acheive disassembly:
-    btc_script = Bitcoin::Script.new String.new
-    chunks = btc_script.parse bytes.pack('C*')
-    btc_script.to_string chunks
+  def hex_stringify(nibbles)
+    nibbles.collect{|c| '%02x' % c}.join
   end
 
   # https://en.bitcoin.it/wiki/Protocol_specification#Variable_length_string

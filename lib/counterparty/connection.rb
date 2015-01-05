@@ -4,8 +4,8 @@ module Counterparty
   # those that prefer the Connection.get_burns syntax instead of the 
   # Counterparty::Burn.find syntax
   class Connection
-    # The default connection timeout, -1 is "no timeout"
-    DEFAULT_TIMEOUT = -1
+    # The default connection timeout, nil is "no timeout"
+    DEFAULT_TIMEOUT = nil
 
     attr_accessor :host, :port, :username, :password
 

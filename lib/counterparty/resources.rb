@@ -682,4 +682,44 @@ module Counterparty
     # expiration occurred
     attr_accessor :block_index 
   end
+  
+  # An object that publishes a compiled serpent contract onto the Counterparty
+  # network
+  class Publish < CounterResource
+    # (string) the source address
+    attr_accessor :source
+
+    # (integer) the price of gas
+    attr_accessor :gasprice
+
+    # (integer) the maximum quantity of {} to be used to pay for the execution (satoshis)
+    attr_accessor :startgas
+
+    # (integer) quantity of {} to be transfered to the contract (satoshis)
+    attr_accessor :endowment
+
+    # (string) the hex‐encoded contract (returned by 'serpent compile')
+    attr_accessor :code_hex
+  end
+
+  # An object that executes contract code in the blockchain
+  class Execute < CounterResource
+    # (string) the source address
+    attr_accessor :source
+
+    # (integer) the price of gas
+    attr_accessor :gasprice
+
+    # (integer) the maximum quantity of {} to be used to pay for the execution (satoshis
+    attr_accessor :startgas
+
+    # (integer) the contract ID of the contract to be executed
+    attr_accessor :contract_id
+
+    # (integer) quantity to be transfered to the contract (satoshis)
+    attr_accessor :value
+    
+    # (string) data to be provided to the contract (returned by serpent encode_datalist)
+    attr_accessor :payload_hex
+  end
 end
