@@ -65,7 +65,7 @@ class RawTx
   # Convert an array of 8 bit numbers into an unsigned int,
   # Remember that for each input byte, the most significant nibble comes last.
   def self.bytes_to_ui(bytes)
-    nibbles = bytes.collect{|b| [b & 0x0f, b >> 4]}.flatten
+    nibbles = bytes.collect{|b| [b & 0x0f, (b & 0xf0) >> 4]}.flatten
     nibbles.each_with_index.inject(0){|sum,(b,i)| sum += b * 16**i}
   end
 

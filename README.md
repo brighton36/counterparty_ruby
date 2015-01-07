@@ -1,5 +1,4 @@
-counterparty_ruby
-[![Gem Version](https://badge.fury.io/rb/counterparty_ruby.svg)](http://badge.fury.io/rb/counterparty_ruby)
+counterparty_ruby [![Gem Version](https://badge.fury.io/rb/counterparty_ruby.svg)](http://badge.fury.io/rb/counterparty_ruby)
 =================
 A ruby gem for communicating with a Counterparty (Bitcoin / XCP) API server.
 

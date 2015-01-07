@@ -14,6 +14,18 @@ module Counterparty
 
   # An object that describes a specific bet.
   class Bet < CounterResource
+    # Bet Type: Bullish CFD 
+    BULLISH_CFD = 0
+
+    # Bet Type: Bearish CFD
+    BEARISH_CFD = 1
+
+    # Bet Type: Equal
+    EQUAL = 2
+
+    # Bet Type: Not Equal
+    NOT_EQUAL = 3
+    
     # (integer): The transaction index
     attr_accessor :tx_index 
 
