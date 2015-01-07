@@ -1,4 +1,8 @@
+require 'spec_helper'
+
 describe Counterparty::ResponseError do
+  include_context 'globals'
+
   let(:bad_issuance) do
     Counterparty::Issuance.new source: source_address,
       asset: 'THISASSETNAMEISFARTOOLONGANDINVALID', 
@@ -26,7 +30,7 @@ describe Counterparty::ResponseError do
   its(:data_args) { should eq(["long asset names must be numeric"]) }
   its(:data_message) { should eq("long asset names must be numeric") }
   its(:code) { should eq(-32000) }
-  its(:message) { should eq("Server error") }
+  its(:message) { should eq("Server error: long asset names must be numeric") }
 end
 
 describe Counterparty::JsonResponseError do

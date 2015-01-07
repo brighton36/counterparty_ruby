@@ -32,6 +32,7 @@ Documentation on the objects is available via:
 
 #### Find the first burn
 Here we retrieve burns from the blockchain using ActiveRecord style method calls.
+
   ```ruby
   require 'counterparty_ruby'
 
@@ -47,6 +48,7 @@ Here we retrieve burns from the blockchain using ActiveRecord style method calls
 #### Find the first burn (Alternative API-like syntax)
 This example achieves the same outcome as the above example, but uses a more 
 json-esque call syntax.
+
   ```ruby
   require 'counterparty_ruby'
 
@@ -63,6 +65,7 @@ json-esque call syntax.
 
 #### Create an Issuance
 Here we create an asset and persist that asset intothe blockchain using ActiveRecord style method calls.
+
   ```ruby
   require 'counterparty_ruby'
 
@@ -83,6 +86,7 @@ Here we create an asset and persist that asset intothe blockchain using ActiveRe
 #### Create an Issuance (Alternative API-like syntax)
 This example achieves the same outcome as the above example, but uses a more 
 json-esque call syntax.
+
   ```ruby
   require 'counterparty_ruby'
 
@@ -101,6 +105,7 @@ json-esque call syntax.
 #### Broadcast the outcome of an event
 If you're the oracle, tasked with resolving a bet, here's how you would announce
 an outcome to the network.
+
   ```ruby
   require 'counterparty_ruby'
 
@@ -121,19 +126,17 @@ an outcome to the network.
   puts "Gold was broadcast down in transaction  %s" % tx_id
   ```
 
-#### Compile, Publish and execute a Serpent Contract
+#### Compile, Publish and Execute a Serpent Contract
 This is still beta behavior, and only supported on testnet, but here's a quick
 example of how Smart Contracts are published and executed. Note that we require
 the serpent CLI executable is installed on the running system
+
   ```ruby
   require 'open3'
   require 'counterparty'
 
-  SOURCE_ADDRESS="msCXwsPVbv1Q1pc5AjXd5TdVwy3a1fSYB2"
-
-  Counterparty.test!
-
   class Serpent
+    # Be sure to use the version from : https://github.com/ethereum/pyethereum
     SERPENT='/usr/local/bin/serpent'
 
     def compile(contract)
@@ -155,6 +158,10 @@ the serpent CLI executable is installed on the running system
       stdout.chomp
     end
   end
+
+  SOURCE_ADDRESS="msCXwsPVbv1Q1pc5AjXd5TdVwy3a1fSYB2"
+
+  Counterparty.test!
 
   serpent = Serpent.new
 

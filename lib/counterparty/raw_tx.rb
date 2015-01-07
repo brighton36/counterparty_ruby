@@ -34,7 +34,8 @@ class RawTx
       # NOTE: The :seq field isnt actually used right now, so some rawtx decoders
       # return the varint (like decoder), and some return UINT_MAX (4294967295)
       { 'txid' => hash, 'vout' => index, 'sequence' => MAX_32BIT_INTEGER,
-        'scriptSig' => {'hex' => hex_stringify(script) } }
+        'scriptSig' => {'hex' => hex_stringify(script), 
+          'asm' => disassemble_script(script) } }
     end
 
     # Parse outputs:
@@ -42,7 +43,8 @@ class RawTx
       value, script = shift_u64(bytes), shift_varchar(bytes)
 
       { 'value' => self.class.bytes_to_ui(value).to_f/1e8, 'n' => i, 
-        'scriptPubKey' => {'hex' => hex_stringify(script) } }
+        'scriptPubKey' => {'hex' => hex_stringify(script), 
+          'asm' => disassemble_script(script) } }
     end
 
     lock_time = shift_u32 bytes
@@ -85,6 +87,13 @@ class RawTx
   end
 
   private 
+
+  def disassemble_script(bytes)
+    # We don't actually need to reference a hash argument to achieve disassembly:
+    btc_script = Bitcoin::Script.new String.new
+    chunks = btc_script.parse bytes.pack('C*')
+    btc_script.to_string chunks
+  end
 
   def hex_stringify(nibbles)
     nibbles.collect{|c| '%02x' % c}.join

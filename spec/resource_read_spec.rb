@@ -3,6 +3,8 @@ require 'spec_helper'
 # NOTE: Most of these examples are from: 
 # https://github.com/CounterpartyXCP/counterpartyd/blob/master/docs/API.rst#id8
 describe Counterparty do
+  include_context 'globals'
+
   before(:all) { Counterparty.production! }
  
   # Get all burns between blocks 280537 and 280539 where greater than .2 BTC was 

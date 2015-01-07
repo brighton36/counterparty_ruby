@@ -74,7 +74,10 @@ describe RawTx do
           { "txid" => "cc2117994b34a915d6da1040720585e4003593c02f671d2019b3cf53df9b54ec",
             "vout" => 1,
             "scriptSig" => {
-              "hex" => "76a9148025b288cb325d88bcd7ef5d1ab1f8827778d5ee88ac"
+              "hex" => "76a9148025b288cb325d88bcd7ef5d1ab1f8827778d5ee88ac",
+              "asm" => %w(OP_DUP OP_HASH160 
+                8025b288cb325d88bcd7ef5d1ab1f8827778d5ee OP_EQUALVERIFY 
+                OP_CHECKSIG).join(' ')
             }, "sequence" => 4294967295 }])
     end
 
@@ -85,18 +88,21 @@ describe RawTx do
             "hex" => "51210286cdf9ec8742c452bd13299771fe40130124038e2198ffc40"+
               "2204c48cc2d32da21033de0df1555e81783f42e00458d0b542ff293d9d04f"+
               "bc7704650448ee07728a8a210286b1e4f15de57fd34bde19cf64ad9302e45"+
-              "4c4c377677581a951579a124b86e753ae" }
+              "4c4c377677581a951579a124b86e753ae",
+            "asm" => "1 0286cdf9ec8742c452bd13299771fe40130124038e2198ffc402204c48cc2d32da 033de0df1555e81783f42e00458d0b542ff293d9d04fbc7704650448ee07728a8a 0286b1e4f15de57fd34bde19cf64ad9302e454c4c377677581a951579a124b86e7 3 OP_CHECKMULTISIG" }
         },
         { "value" => 0.00007800, "n" => 1,
           "scriptPubKey" => {
             "hex" => "512102a2cdf9ec8742c452bd2214fe01c9f33b0d0066ed0efb90aa71"+
               "5400038c1c621921034f89bc70758771a393416c21a12b651db3def9851bf"+
               "f574904762b86365caaea210286b1e4f15de57fd34bde19cf64ad9302e454"+
-              "c4c377677581a951579a124b86e753ae" }
+              "c4c377677581a951579a124b86e753ae",
+            "asm" => "1 02a2cdf9ec8742c452bd2214fe01c9f33b0d0066ed0efb90aa715400038c1c6219 034f89bc70758771a393416c21a12b651db3def9851bff574904762b86365caaea 0286b1e4f15de57fd34bde19cf64ad9302e454c4c377677581a951579a124b86e7 3 OP_CHECKMULTISIG" }
         },
         { "value" => 2.25950400, "n" => 2,
           "scriptPubKey" => {
-            "hex" => "76a9148025b288cb325d88bcd7ef5d1ab1f8827778d5ee88ac" } } ] )
+            "hex" => "76a9148025b288cb325d88bcd7ef5d1ab1f8827778d5ee88ac",
+            "asm" => "OP_DUP OP_HASH160 8025b288cb325d88bcd7ef5d1ab1f8827778d5ee OP_EQUALVERIFY OP_CHECKSIG" } } ] )
     end
   end
  

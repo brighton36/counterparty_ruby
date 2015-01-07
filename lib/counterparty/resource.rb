@@ -74,6 +74,28 @@ module Counterparty
       key = ::Bitcoin.open_key pkey_wif
       raw_tx_hash = RawTx.new(raw_tx).to_hash
 
+      prev_hash = raw_tx_hash['vin'][0]['txid']
+      prior_tx_json = open("http://test.webbtc.com/tx/#{prev_hash}.json").read
+      puts prior_tx_json.inspect
+      prev_tx = Bitcoin::P::Tx.from_json(prior_tx_json.to_s)
+
+      
+      puts "HERE" 
+      signed_tx = Bitcoin::Protocol::Tx.new
+      signed_tx.ver = raw_tx_hash['ver']
+      signed_tx.lock = raw_tx_hash['lock_time']
+      
+      tx_in= TxInBuilder.new
+      tx_in.prev_out prev_tx
+      tx_in.prev_out_index 0
+      tx_in.signature_key key
+
+      signed_tx.add_in tx_in.tx
+
+        # Here's how we put them in the raw
+        # @block.tx << tx
+
+
       # We need to compare against
       # Primarily: http://www.righto.com/2014/02/bitcoins-hard-way-using-raw-bitcoin.html
       # With Some of this: https://bitcoin.org/en/developer-reference#signrawtransaction

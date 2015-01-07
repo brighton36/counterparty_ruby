@@ -5,6 +5,8 @@ require 'spec_helper'
 # The tests have to run in the specified order, as we populate our test account
 # before running test operations
 describe Counterparty do
+  include_context 'globals'
+
   before(:all) { Counterparty.test! }
 
   # TODO: deprecate?
@@ -39,9 +41,8 @@ describe Counterparty do
   describe "#do_issuance" do
     subject do
       Counterparty::Issuance.new source: source_address, asset: unique_asset_name, 
-        quantity: 1000, description: "my asset is cool",
-        callable: true, call_date: 1418926641, call_price: 100000000,
-        divisible: true, allow_unconfirmed_inputs: true
+        quantity: 1000, description: "my asset is cool", divisible: true, 
+        allow_unconfirmed_inputs: true
     end
 
     its(:to_raw_tx) { should_not be_empty }
@@ -60,12 +61,8 @@ describe Counterparty do
     its(:to_raw_tx) { should_not be_empty }
 
     it "should persist using a provided key" do
-      begin 
-        # TODO: why is this failing... I think the key isn't in WIF format
-        expect(subject.save!(source_privkey)).to_not be_empty
-      rescue Counterparty::ResponseError => e
-        puts e.inspect
-      end
+      # TODO: Make this work
+      expect(subject.save!(source_privkey)).to_not be_empty
     end
   end
 

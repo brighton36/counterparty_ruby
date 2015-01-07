@@ -417,18 +417,6 @@ module Counterparty
     # (string): This is used when creating an issuance transfer, and indicates 
     # the destination address of the asset
     attr_accessor :transfer_destination
-
-    # (integer): This is used when creating an issuance, and indicates 
-    # the call date
-    attr_accessor :call_date
-
-    # (integer): This is used when creating an issuance, and indicates 
-    # the call price
-    attr_accessor :call_price
-
-    # (boolean): This is used when creating an issuance, and indicates 
-    # whether the asset is callable
-    attr_accessor :callable
   end
 
   # An object that describes a specific order.

@@ -1,5 +1,6 @@
 require 'json'
 require 'rest_client'
+require 'open-uri'
 require 'bitcoin'
 
 require 'counterparty/raw_tx'
@@ -27,16 +28,20 @@ module Counterparty
     attr_reader :data_args
     attr_reader :data_message
     attr_reader :code
-    attr_reader :message
+    attr_reader :message_class
 
     def initialize(json)
-      @message, @code = json['message'], json['code']
+      @message_class, @code = json['message'], json['code']
 
       json['data'].each_pair do |(k,v)|
         instance_variable_set '@data_%s' % k, v
       end if json.has_key? 'data'
 
       super
+    end
+
+    def message
+      '%s: %s' % [@message_class,@data_message]
     end
   end
   
