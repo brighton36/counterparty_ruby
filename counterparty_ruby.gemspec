@@ -14,7 +14,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Counterparty::VERSION
   gem.required_ruby_version = '>= 1.9'
-  gem.license       = 'MIT'
+  gem.license       = 'LGPL'
 
   ['rest_client', 'bitcoin-ruby', 'ffi'].each do |dependency|
     gem.add_runtime_dependency dependency

@@ -2,7 +2,7 @@ $:<< File.join(File.dirname(__FILE__), '..','lib')
 
 require 'yaml'
 require 'rspec/its'
-require 'counterparty'
+require 'counterparty_ruby'
 
 shared_context 'globals' do
   let(:config) do
