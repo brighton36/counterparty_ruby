@@ -25,7 +25,11 @@ module Counterparty
 
     # Bet Type: Not Equal
     NOT_EQUAL = 3
-    
+
+    # Denominator by which the leverage integer is divided by. It's effectively
+    # a 'magic' number that allows us to keep the leverage parameter an integer
+    LEVERAGE_BASIS = 5040
+
     # (integer): The transaction index
     attr_accessor :tx_index 
 
@@ -79,11 +83,11 @@ module Counterparty
     attr_accessor :validity 
 
     # (integer): The quantity of XCP to wager. (Only used in Create)
-    attr_accessor :wager
+    attr_accessor :wager_quantity
 
     # (integer): The minimum quantity of XCP to be 
     # wagered against, for the bets to match. (Only used in Create)
-    attr_accessor :counterwager 
+    attr_accessor :counterwager_quantity 
   end
 
   # An object that describes a specific occurance of two bets being matched 
@@ -159,6 +163,9 @@ module Counterparty
   # An object that describes a specific occurance of a broadcast event 
   # (i.e. creating/extending a feed)
   class Broadcast < CounterResource
+    # Value: Open Broadcast
+    OPEN_BROADCAST = -1.0
+    
     # (integer): The transaction index
     attr_accessor :tx_index 
 

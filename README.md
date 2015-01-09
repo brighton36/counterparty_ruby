@@ -125,7 +125,64 @@ an outcome to the network.
 
   puts "Gold was broadcast down in transaction  %s" % tx_id
   ```
+#### Broadcast a Feed, Place Bets, Resolve the Bet
+In this example, we declare a bet that open, and have two people bet each other
+on the outcome. The bet is then resolved.
 
+
+  ```ruby
+  require 'counterparty_ruby'
+  require 'active_support/time'
+  require "active_support/core_ext/numeric/time"
+
+  TEAM_BLUE_WINS = 1
+  TEAM_RED_WINS = 2
+
+  ALICE_ADDRESS = 'n4m2u8GwmFB8VDE1szCTkX5ikEEQLiR2Kj'
+  JOHN_ADDRESS = 'mu23MfDNhYmQkJF36aJZ783dLDMrqUi9Fa'
+
+  ORACLE_ADDRESS = 'msCXwsPVbv1Q1pc5AjXd5TdVwy3a1fSYB2'
+
+  Counterparty.test!
+
+  broadcast_text = "Winner of game, %s. %s=red %s=blue" % [
+    Time.now.strftime("%I%p %Z %b%-d"), TEAM_RED_WINS, TEAM_BLUE_WINS]
+
+  # Announce the availability of a Bet:
+  # NOTE: All times are in UTC
+  tx_init = Counterparty::Broadcast.new( source: ORACLE_ADDRESS, 
+    value: Counterparty::Broadcast::OPEN_BROADCAST, timestamp: Time.now.to_i,
+    text: broadcast_text, fee_fraction: 0.00, allow_unconfirmed_inputs: true ).save!
+
+  # Alice Bets on Blue:
+  tx_bet_on_blue = Counterparty::Bet.new(source: ALICE_ADDRESS, 
+    feed_address: ORACLE_ADDRESS, bet_type: Counterparty::Bet::EQUAL, 
+    deadline: 10.minutes.from_now.to_i, wager_quantity: 5, 
+    counterwager_quantity: 1, expiration: 5, 
+    target_value: TEAM_BLUE_WINS, leverage: Counterparty::Bet::LEVERAGE_BASIS,
+    allow_unconfirmed_inputs: true ).save!
+
+  puts "Alice on Blue: %s" % tx_bet_on_blue
+
+  # John Bets on Red:
+  tx_bet_on_red = Counterparty::Bet.new(source: JOHN_ADDRESS, 
+    feed_address: ORACLE_ADDRESS, bet_type: Counterparty::Bet::EQUAL, 
+    deadline: 10.minutes.from_now.to_i, wager_quantity: 5, 
+    counterwager_quantity: 1, expiration: 5,
+    target_value: TEAM_RED_WINS, leverage: Counterparty::Bet::LEVERAGE_BASIS,
+    allow_unconfirmed_inputs: true ).save!
+
+  puts "John on Red: %s" % tx_bet_on_red
+
+  # Close the broadcast : Team Blue wins!
+  tx_outcome = Counterparty::Broadcast.new( source: ORACLE_ADDRESS, 
+    value: TEAM_BLUE_WINS, timestamp: 20.minutes.from_now.to_i, 
+    fee_fraction: 0.00,
+    text: broadcast_text, allow_unconfirmed_inputs: true ).save!
+
+  puts "Oracle says: %s" % tx_outcome
+
+  ```
 #### Compile, Publish and Execute a Serpent Contract
 This is still beta behavior, and only supported on testnet, but here's a quick
 example of how Smart Contracts are published and executed. Note that we require

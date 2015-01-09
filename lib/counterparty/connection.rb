@@ -37,8 +37,8 @@ module Counterparty
     # given params.
     def request(method, params)
       client = RestClient::Resource.new api_url, :timeout => @timeout
-      response = JSON.parse client.post({ method: method, 
-        params: params, jsonrpc: '2.0', id: '0' }.to_json,
+      request = { method: method, params: params, jsonrpc: '2.0', id: '0' }.to_json
+      response = JSON.parse client.post(request,
         user: @username, password: @password, accept: 'json', 
         content_type: 'json' )
 
