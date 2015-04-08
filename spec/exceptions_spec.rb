@@ -3,6 +3,10 @@ require 'spec_helper'
 describe Counterparty::ResponseError do
   include_context 'globals'
 
+  before(:all) do
+    Counterparty.connection = Counterparty::Connection.new(*connection('test'))
+  end
+
   let(:bad_issuance) do
     Counterparty::Issuance.new source: source_address,
       asset: 'THISASSETNAMEISFARTOOLONGANDINVALID', 

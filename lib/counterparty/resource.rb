@@ -62,7 +62,7 @@ module Counterparty
     def save!(private_key = nil)
       (private_key) ? 
         connection.broadcast_tx( to_signed_tx(private_key) ) :
-        connection.request(self.class.to_do_request, to_params)
+        connection.request(self.class.to_create_request, to_params)
     end
 
     private
@@ -71,16 +71,17 @@ module Counterparty
     # is a stub for when we decide in the future to Use the bitcoin-client gem
     # to perform signatures
     def sign_tx(raw_tx, pkey_wif)
+      # TOOD: 
       key = ::Bitcoin.open_key pkey_wif
       raw_tx_hash = RawTx.new(raw_tx).to_hash
 
       prev_hash = raw_tx_hash['vin'][0]['txid']
       prior_tx_json = open("http://test.webbtc.com/tx/#{prev_hash}.json").read
-      puts prior_tx_json.inspect
+      #puts prior_tx_json.inspect
       prev_tx = Bitcoin::P::Tx.from_json(prior_tx_json.to_s)
 
       
-      puts "HERE" 
+      #puts "HERE" 
       signed_tx = Bitcoin::Protocol::Tx.new
       signed_tx.ver = raw_tx_hash['ver']
       signed_tx.lock = raw_tx_hash['lock_time']
@@ -151,11 +152,6 @@ def sign(tx, i, priv, hashcode=SIGHASH_ALL):
       # been set, the default specified in the Counterparty module
       def connection
         @connection || Counterparty.connection
-      end
-
-      # Returns the method name of a do_* request for this resource
-      def to_do_request
-        'do_%s' % api_name
       end
 
       # Returns the method name of a create_* request for this resource

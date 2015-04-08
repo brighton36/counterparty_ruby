@@ -5,7 +5,9 @@ require 'spec_helper'
 describe Counterparty do
   include_context 'globals'
 
-  before(:all) { Counterparty.production! }
+  before(:all) do
+    Counterparty.connection = Counterparty::Connection.new(*connection('main'))
+  end
  
   # Get all burns between blocks 280537 and 280539 where greater than .2 BTC was 
   # burned, sorting by tx_hash (ascending order) With this (and the rest of the 

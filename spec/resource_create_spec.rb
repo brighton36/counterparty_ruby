@@ -7,7 +7,9 @@ require 'spec_helper'
 describe Counterparty do
   include_context 'globals'
 
-  before(:all) { Counterparty.test! }
+  before(:all) do
+    Counterparty.connection = Counterparty::Connection.new(*connection('test'))
+  end
 
   # TODO: deprecate?
   #it "Ensure test account has BTC" do
@@ -54,7 +56,7 @@ describe Counterparty do
       # We want the save(private_key) syntax here
       Counterparty::Broadcast.new source: source_address, fee_fraction: 0.05,
         text: "Price of gold, 12AM UTC March1. 1=inc 2=dec/const", value: 2.0,
-        timestamp: 1418926641, 
+        timestamp: Time.now.to_i, 
         allow_unconfirmed_inputs: true
     end
 

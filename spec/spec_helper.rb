@@ -4,10 +4,17 @@ require 'yaml'
 require 'rspec/its'
 require 'counterparty_ruby'
 
+def config_yaml
+  YAML.load File.open([File.dirname(__FILE__),'config.yml'].join('/')).read
+end
+
+def connection(env)
+  config = config_yaml[env]
+  %w(port username password host).collect{ |a| config[a] }
+end
+
 shared_context 'globals' do
-  let(:config) do
-    YAML.load File.open([File.dirname(__FILE__),'config.yml'].join('/')).read
-  end
+  let(:config){ config_yaml }
 
   let(:source_address) { config['source_address'] }
   let(:source_privkey) { config['source_privkey'] }
