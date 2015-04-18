@@ -8,11 +8,6 @@ def config_yaml
   YAML.load File.open([File.dirname(__FILE__),'config.yml'].join('/')).read
 end
 
-def connection(env)
-  config = config_yaml[env]
-  %w(port username password host).collect{ |a| config[a] }
-end
-
 shared_context 'globals' do
   let(:config){ config_yaml }
 

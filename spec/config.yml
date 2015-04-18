@@ -1,13 +1,3 @@
 source_address: msCXwsPVbv1Q1pc5AjXd5TdVwy3a1fSYB2
 source_privkey: cP7ufwcbZujaa1qkKthLbVZUaP88RS5r9awyXerJE5rAEMTRVmzc
 spend_destination: msj42CCGruhRsFrGATiUuh25dtxYtnpbTx
-main:
-  host: localhost
-  port: 4000
-  username: rpc
-  password: TODO:Replace!
-test:
-  host: localhost
-  port: 14000
-  username: rpc
-  password: TODO:Replace!

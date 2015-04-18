@@ -7,15 +7,6 @@ require 'spec_helper'
 describe Counterparty do
   include_context 'globals'
 
-  before(:all) do
-    Counterparty.connection = Counterparty::Connection.new(*connection('test'))
-  end
-
-  # TODO: deprecate?
-  #it "Ensure test account has BTC" do
-    #expect(bitcoin.getreceivedbyaddress(source_address)).to be > 0
-  #end
-
   describe "Ensure test account has XCP" do
     subject do
       Counterparty::Balance.find( filters: 
@@ -37,7 +28,10 @@ describe Counterparty do
     end
 
     its(:to_raw_tx) { should_not be_empty }
-    its(:save!) { should_not be_empty }
+
+    it "should persist asset send" do
+      expect(subject.save!(source_privkey)).to_not be_empty
+    end
   end
 
   describe "#do_issuance" do
@@ -48,7 +42,10 @@ describe Counterparty do
     end
 
     its(:to_raw_tx) { should_not be_empty }
-    its(:save!) { should_not be_empty }
+
+    it "should persist issuance" do
+      expect(subject.save!(source_privkey)).to_not be_empty
+    end
   end
 
   describe "signed #create_broadcast" do
@@ -62,8 +59,7 @@ describe Counterparty do
 
     its(:to_raw_tx) { should_not be_empty }
 
-    it "should persist using a provided key" do
-      # TODO: Make this work
+    it "should persist broadcast" do
       expect(subject.save!(source_privkey)).to_not be_empty
     end
   end

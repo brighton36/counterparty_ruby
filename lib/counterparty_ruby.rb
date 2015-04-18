@@ -3,6 +3,7 @@ require 'rest_client'
 require 'open-uri'
 require 'bitcoin'
 
+require 'blockr_io'
 require 'counterparty/raw_tx'
 require 'counterparty/version'
 require 'counterparty/resource'
@@ -46,6 +47,9 @@ module Counterparty
   end
   
   class << self
+    # Sets/Gets the default bitcoin (connection) object
+    attr_writer :bitcoin
+
     # Sets/Gets the default connection object
     attr_writer :connection
 
@@ -55,16 +59,24 @@ module Counterparty
       @connection || Connection.new
     end
 
+    # Returns the current default bitcoin object, or creates a new test-mode
+    # connection, if none has been defined
+    def bitcoin
+      @bitcoin || BlockrIo.new
+    end
+
     # Establishes the default connection for new objects as being the default 
     # counterparty production mode port/user/ip
     def production!
-      @connection = Connection.new 4000
+      @connection = Connection.new 
+      @bitcoin = BlockrIo.new
     end
 
     # Establishes the default connection for new objects as being the default 
     # counterparty test mode port/user/ip
     def test!
-      @connection = Connection.new
+      @connection = Connection.new 14000
+      @bitcoin = BlockrIo.new true
     end
   end
 end

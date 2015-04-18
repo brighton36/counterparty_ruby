@@ -47,9 +47,6 @@ module Counterparty
 
     # Given the provided private key, this method returns a signed transaction
     # suitable for broadcasting on the network. 
-    #
-    # NOTE: This method communicates your private key to the counterpartyd
-    # server, which might not be what you want!
     def to_signed_tx(private_key)
       sign_tx to_raw_tx, private_key
     end
@@ -57,12 +54,8 @@ module Counterparty
     # Commit this object to the blockchain. If a private key is passed, the 
     # transaction is signed using this key via a create_ call and a subsequent
     # sign_tx call. 
-    # NOTE: This method communicates your private key to the counterpartyd
-    # server, which might not be what you want!
-    def save!(private_key = nil)
-      (private_key) ? 
-        connection.broadcast_tx( to_signed_tx(private_key) ) :
-        connection.request(self.class.to_create_request, to_params)
+    def save!(private_key)
+      bitcoin.sendrawtransaction to_signed_tx(private_key)
     end
 
     private
@@ -71,60 +64,36 @@ module Counterparty
     # is a stub for when we decide in the future to Use the bitcoin-client gem
     # to perform signatures
     def sign_tx(raw_tx, pkey_wif)
-      # TOOD: 
-      key = ::Bitcoin.open_key pkey_wif
-      raw_tx_hash = RawTx.new(raw_tx).to_hash
+      # Seems like this is your quintessential reference: 
+      # http://www.righto.com/2014/02/bitcoins-hard-way-using-raw-bitcoin.html
 
-      prev_hash = raw_tx_hash['vin'][0]['txid']
-      prior_tx_json = open("http://test.webbtc.com/tx/#{prev_hash}.json").read
-      #puts prior_tx_json.inspect
-      prev_tx = Bitcoin::P::Tx.from_json(prior_tx_json.to_s)
+      # I think this is the right way to do it...
+      Bitcoin.network = (@bitcoin.is_testing?) ? :testnet3 : :bitcoin
 
-      
-      #puts "HERE" 
-      signed_tx = Bitcoin::Protocol::Tx.new
-      signed_tx.ver = raw_tx_hash['ver']
-      signed_tx.lock = raw_tx_hash['lock_time']
-      
-      tx_in= TxInBuilder.new
-      tx_in.prev_out prev_tx
-      tx_in.prev_out_index 0
-      tx_in.signature_key key
+      # This parses the binary-encoded raw transaction:
+      tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
 
-      signed_tx.add_in tx_in.tx
+      # This is the input transaction, which we'll need for signining:
+      prev_hash = tx.in[0].prev_out.reverse_hth
 
-        # Here's how we put them in the raw
-        # @block.tx << tx
+      # let's parse the keys:
+      key = Bitcoin::Key.from_base58 pkey_wif
 
+      pubkey = [key.pub].pack('H*')
 
-      # We need to compare against
-      # Primarily: http://www.righto.com/2014/02/bitcoins-hard-way-using-raw-bitcoin.html
-      # With Some of this: https://bitcoin.org/en/developer-reference#signrawtransaction
-=begin
-def sign(tx, i, priv, hashcode=SIGHASH_ALL):                                    
-    i = int(i)                                                                  
-    if not re.match('^[0-9a-fA-F]*$', tx):                                      
-        return binascii.unhexlify(sign(binascii.hexlify(tx), i, priv))          
-    if len(priv) <= 33:                                                         
-        priv = binascii.hexlify(priv)                                           
-    pub = privkey_to_pubkey(priv)                                               
-    address = pubkey_to_address(pub)                                            
-    signing_tx = signature_form(tx, i, mk_pubkey_script(address), hashcode)     
-    sig = ecdsa_tx_sign(signing_tx, priv, hashcode)                             
-    txobj = deserialize(tx)                                                     
-    txobj["ins"][i]["script"] = serialize_script([sig, pub])                    
-    return serialize(txobj)                                                     
-=end
+      # And parse the input transaction:
+      prev_tx = Bitcoin::P::Tx.from_hash @bitcoin.gettransaction(prev_hash)
 
-      
-      scriptSig = Bitcoin.sign_data(key, 
-        raw_tx_hash["in"][0]["scriptSig"] ).unpack('h*').first
-      # TODO: We may have to iterate over each input
-      raw_tx_hash["in"][0]["scriptSig"] = scriptSig
+      # And, now we're ready to sign: 
+      subscript = tx.signature_hash_for_input 0, prev_tx
+      sig = Bitcoin.sign_data Bitcoin.open_key(key.priv), subscript
+      tx.in[0].script_sig = Bitcoin::Script.to_signature_pubkey_script sig, pubkey 
 
-      ret = Bitcoin::Protocol::Tx.from_hash(raw_tx_hash).to_payload.unpack('h*').first
+      tx.to_payload.unpack('H*')[0]
+    end
 
-      ret
+    def bitcoin
+      self.class.bitcoin
     end
 
     def connection
@@ -152,6 +121,12 @@ def sign(tx, i, priv, hashcode=SIGHASH_ALL):
       # been set, the default specified in the Counterparty module
       def connection
         @connection || Counterparty.connection
+      end
+
+      # Returns the currently assigned connection object, or if one hasn't
+      # been set, the default specified in the Counterparty module
+      def bitcoin
+        @bitcoin || Counterparty.bitcoin
       end
 
       # Returns the method name of a create_* request for this resource
