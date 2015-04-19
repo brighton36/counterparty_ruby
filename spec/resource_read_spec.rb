@@ -7,6 +7,7 @@ describe Counterparty do
 
   before(:all) do
     Counterparty.production!
+    Counterparty.connection = local_counterpartyd :main if use_local_counterpartyd?
   end
  
   # Get all burns between blocks 280537 and 280539 where greater than .2 BTC was 

@@ -16,13 +16,8 @@ class BlockrIo
   end
 
   def sendrawtransaction(raw_tx)
-    client = RestClient::Resource.new [api_url,'tx/push'].join('/')
-    resp = JSON.parse client.post( {hex: raw_tx}.to_json, 
-      accept: 'json', content_type: 'json' )
-
-    raise ResponseError unless resp['status'] == 'success' && resp['code'] == 200
-
-    resp['data']
+    request('tx', 'push'){|req| req.post( {hex: raw_tx}.to_json, 
+      accept: 'json', content_type: 'json' ) }['data']
   end
 
   def is_testing?
@@ -31,10 +26,17 @@ class BlockrIo
 
   private
 
-  def json_get(*path_parts)
-    url = ([api_url]+path_parts).join('/')
-    json = JSON.parse(RestClient.get(url), content_type: 'json')
+  def request(*path, &block)
+    json = JSON.parse(block.call(client(*path)))
     raise ResponseError unless json['status'] == 'success' && json['code'] == 200
     json
+  end
+
+  def client(*path_parts)
+     RestClient::Resource.new( ([api_url]+path_parts).join('/') )
+  end
+
+  def json_get(*path)
+    request(*path){ |req| req.get content_type: 'json' }
   end
 end

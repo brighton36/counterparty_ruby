@@ -51,69 +51,6 @@ module Counterparty
       define_method(klass.to_create_request){ |params| klass.create(params).to_raw_tx }
     end
 
-    # :method: create_balance
-    # # Sends a create_balance call to the counterpartyd server, given the provided params
-
-    # :method: create_bet
-    # # Sends a create_bet call to the counterpartyd server, given the provided params
-
-    # :method: create_betmatch
-    # # Sends a create_betmatch call to the counterpartyd server, given the provided params
-
-    # :method: create_broadcast
-    # # Sends a create_broadcast call to the counterpartyd server, given the provided params
-
-    # :method: create_btcpay
-    # # Sends a create_btcpay call to the counterpartyd server, given the provided params
-
-    # :method: create_burn
-    # # Sends a create_burn call to the counterpartyd server, given the provided params
-
-    # :method: create_callback
-    # # Sends a create_callback call to the counterpartyd server, given the provided params
-
-    # :method: create_cancel
-    # # Sends a create_cancel call to the counterpartyd server, given the provided params
-
-    # :method: create_credit
-    # # Sends a create_credit call to the counterpartyd server, given the provided params
-
-    # :method: create_debit
-    # # Sends a create_debit call to the counterpartyd server, given the provided params
-
-    # :method: create_dividend
-    # # Sends a create_dividend call to the counterpartyd server, given the provided params
-
-    # :method: create_issuance
-    # # Sends a create_issuance call to the counterpartyd server, given the provided params
-
-    # :method: create_order
-    # # Sends a create_order call to the counterpartyd server, given the provided params
-
-    # :method: create_ordermatch
-    # # Sends a create_ordermatch call to the counterpartyd server, given the provided params
-
-    # :method: create_send
-    # # Sends a create_send call to the counterpartyd server, given the provided params
-
-    # :method: create_message
-    # # Sends a create_message call to the counterpartyd server, given the provided params
-
-    # :method: create_callback
-    # # Sends a create_callback call to the counterpartyd server, given the provided params
-
-    # :method: create_betexpiration
-    # # Sends a create_betexpiration call to the counterpartyd server, given the provided params
-
-    # :method: create_orderexpiration
-    # # Sends a create_orderexpiration call to the counterpartyd server, given the provided params
-
-    # :method: create_betmatchexpiration
-    # # Sends a create_betmatchexpiration call to the counterpartyd server, given the provided params
-
-    # :method: create_ordermatchexpiration
-    # # Sends a create_ordermatchexpiration call to the counterpartyd server, given the provided params
-
     # Go ahead and setup the defined resources, and throw them into the native-style
     # api methods:
     Counterparty.constants.each do |c| 

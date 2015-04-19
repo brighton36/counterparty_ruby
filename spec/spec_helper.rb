@@ -4,8 +4,18 @@ require 'yaml'
 require 'rspec/its'
 require 'counterparty_ruby'
 
-def config_yaml
-  YAML.load File.open([File.dirname(__FILE__),'config.yml'].join('/')).read
+def config_yaml(file = 'config.yml') 
+  YAML.load File.open([File.dirname(__FILE__),file].join('/')).read
+end
+
+def local_counterpartyd(network)
+  config = config_yaml('config.local.yml')
+  args = %w(port username password host).collect{ |a| config[network.to_s][a] }
+  Counterparty::Connection.new *args
+end
+
+def use_local_counterpartyd?
+  File.exists? [File.dirname(__FILE__),'config.local.yml'].join('/')
 end
 
 shared_context 'globals' do

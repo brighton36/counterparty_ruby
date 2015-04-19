@@ -5,6 +5,7 @@ describe Counterparty::ResponseError do
 
   before(:all) do
     Counterparty.test!
+    Counterparty.connection = local_counterpartyd :test if use_local_counterpartyd?
   end
 
   let(:bad_issuance) do

@@ -78,7 +78,7 @@ Here we create an asset and persist that asset intothe blockchain using ActiveRe
     divisible: false,
     quantity: 100 )
 
-  transaction_id = first_asset.save!                                          
+  transaction_id = first_asset.save!('private-key-here')
 
   puts "Transaction %s has been entered into the mempool" % transaction_id
   ```
@@ -152,7 +152,7 @@ on the outcome. The bet is then resolved.
   # NOTE: All times are in UTC
   tx_init = Counterparty::Broadcast.new( source: ORACLE_ADDRESS, 
     value: Counterparty::Broadcast::OPEN_BROADCAST, timestamp: Time.now.to_i,
-    text: broadcast_text, fee_fraction: 0.00, allow_unconfirmed_inputs: true ).save!
+    text: broadcast_text, fee_fraction: 0.00, allow_unconfirmed_inputs: true ).save!('private-key-here')
 
   # Alice Bets on Blue:
   tx_bet_on_blue = Counterparty::Bet.new(source: ALICE_ADDRESS, 
@@ -160,7 +160,7 @@ on the outcome. The bet is then resolved.
     deadline: 10.minutes.from_now.to_i, wager_quantity: 5, 
     counterwager_quantity: 1, expiration: 5, 
     target_value: TEAM_BLUE_WINS, leverage: Counterparty::Bet::LEVERAGE_BASIS,
-    allow_unconfirmed_inputs: true ).save!
+    allow_unconfirmed_inputs: true ).save!('private-key-here')
 
   puts "Alice on Blue: %s" % tx_bet_on_blue
 
@@ -170,7 +170,7 @@ on the outcome. The bet is then resolved.
     deadline: 10.minutes.from_now.to_i, wager_quantity: 5, 
     counterwager_quantity: 1, expiration: 5,
     target_value: TEAM_RED_WINS, leverage: Counterparty::Bet::LEVERAGE_BASIS,
-    allow_unconfirmed_inputs: true ).save!
+    allow_unconfirmed_inputs: true ).save!('private-key-here')
 
   puts "John on Red: %s" % tx_bet_on_red
 
@@ -178,7 +178,7 @@ on the outcome. The bet is then resolved.
   tx_outcome = Counterparty::Broadcast.new( source: ORACLE_ADDRESS, 
     value: TEAM_BLUE_WINS, timestamp: 20.minutes.from_now.to_i, 
     fee_fraction: 0.00,
-    text: broadcast_text, allow_unconfirmed_inputs: true ).save!
+    text: broadcast_text, allow_unconfirmed_inputs: true ).save!('private-key-here')
 
   puts "Oracle says: %s" % tx_outcome
 
@@ -228,13 +228,13 @@ the serpent CLI executable is installed on the running system
 
   contract_id = Counterparty::Publish.new( source: SOURCE_ADDRESS, 
     code_hex: compiled_script, gasprice: 1, startgas: 1000000, endowment: 0, 
-    allow_unconfirmed_inputs: true ).save!
+    allow_unconfirmed_inputs: true ).save!('private-key-here')
 
   datalist = serpent.encode_datalist '53'
 
   execute_id = Counterparty::Execute.new( source: SOURCE_ADDRESS, 
     contract_id: contract_id, payload_hex: datalist, gasprice: 5, 
-    startgas: 160000, value: 10, allow_unconfirmed_inputs: true ).save!
+    startgas: 160000, value: 10, allow_unconfirmed_inputs: true ).save!('private-key-here')
 
   puts "Executed Transaction ID: %s" % execute_id
   ```

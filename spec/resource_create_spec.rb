@@ -9,6 +9,7 @@ describe Counterparty do
 
   before(:all) do
     Counterparty.test!
+    Counterparty.connection = local_counterpartyd :test if use_local_counterpartyd?
   end
 
   describe "Ensure test account has XCP" do
