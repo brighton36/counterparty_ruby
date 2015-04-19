@@ -11,25 +11,18 @@ class BlockrIo
     'http://%s.blockr.io/api/v1' % (is_testing? ? 'tbtc' : 'btc')
   end
 
-  def gettransaction(tx_id)
-    json_get('tx', 'info', tx_id.to_s)['data']
+  def getrawtransaction(tx_id)
+    json_get('tx', 'raw', tx_id.to_s)['data']['tx']['hex']
   end
 
   def sendrawtransaction(raw_tx)
-    # TODO:
-    # curl -d '{"hex":"TX_HASH"}' http://btc.blockr.io/api/v1/tx/push
-=begin
-    client = RestClient::Resource.new api_url, :timeout => @timeout
-    request = { method: method, params: params, jsonrpc: '2.0', id: '0' }.to_json
-    response = JSON.parse client.post(request,
-      user: @username, password: @password, accept: 'json', 
-      content_type: 'json' )
+    client = RestClient::Resource.new [api_url,'tx/push'].join('/')
+    resp = JSON.parse client.post( {hex: raw_tx}.to_json, 
+      accept: 'json', content_type: 'json' )
 
-    raise JsonResponseError.new response if response.has_key? 'code'
-    raise ResponseError.new response['error'] if response.has_key? 'error'
+    raise ResponseError unless resp['status'] == 'success' && resp['code'] == 200
 
-    response['result']
-=end
+    resp['data']
   end
 
   def is_testing?

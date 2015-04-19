@@ -68,7 +68,7 @@ module Counterparty
       # http://www.righto.com/2014/02/bitcoins-hard-way-using-raw-bitcoin.html
 
       # I think this is the right way to do it...
-      Bitcoin.network = (@bitcoin.is_testing?) ? :testnet3 : :bitcoin
+      Bitcoin.network = (bitcoin.is_testing?) ? :testnet3 : :bitcoin
 
       # This parses the binary-encoded raw transaction:
       tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
@@ -82,7 +82,7 @@ module Counterparty
       pubkey = [key.pub].pack('H*')
 
       # And parse the input transaction:
-      prev_tx = Bitcoin::P::Tx.from_hash @bitcoin.gettransaction(prev_hash)
+      prev_tx = Bitcoin::P::Tx.new [bitcoin.getrawtransaction(prev_hash)].pack('H*')
 
       # And, now we're ready to sign: 
       subscript = tx.signature_hash_for_input 0, prev_tx

@@ -6,7 +6,7 @@ describe Counterparty do
   include_context 'globals'
 
   before(:all) do
-    Counterparty.connection = Counterparty::Connection.new(*connection('main'))
+    Counterparty.production!
   end
  
   # Get all burns between blocks 280537 and 280539 where greater than .2 BTC was 

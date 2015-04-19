@@ -7,6 +7,10 @@ require 'spec_helper'
 describe Counterparty do
   include_context 'globals'
 
+  before(:all) do
+    Counterparty.test!
+  end
+
   describe "Ensure test account has XCP" do
     subject do
       Counterparty::Balance.find( filters: 

@@ -4,7 +4,7 @@ describe Counterparty::ResponseError do
   include_context 'globals'
 
   before(:all) do
-    Counterparty.connection = Counterparty::Connection.new(*connection('test'))
+    Counterparty.test!
   end
 
   let(:bad_issuance) do
@@ -19,12 +19,12 @@ describe Counterparty::ResponseError do
   end
 
   it "should fail on save!" do
-    expect{ bad_issuance.save! }.to raise_error Counterparty::ResponseError
+    expect{ bad_issuance.save!(source_privkey) }.to raise_error Counterparty::ResponseError
   end
 
   subject do
     begin
-      bad_issuance.save!
+      bad_issuance.save!(source_privkey)
     rescue => error
       error
     end
