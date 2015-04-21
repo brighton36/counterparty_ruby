@@ -26,15 +26,15 @@ setting everything up.
 ![Party On Wayne](http://data.whicdn.com/images/24796384/tumblr_m0ng6rBeWT1qhd0xso1_500_large.jpg)
 
 ## Changelog
-*Version 1.1.0*
+_Version 1.1_
   * Minor Updates to support changes in counterpartyd 1.1
   * Removed support for relaying transactions through counterparty
   * Implemented bitcoin-ruby based transaction signing
-  * Added a blockr.io library for relaying signed transactions
+  * Added a blockr.io library for relaying signed transactions via http
   * save() syntax now requires that a private key be provided to persist transactions
   * Default test and production counterparty servers were changed to the vennd.io public servers
 
-*Version 0.9*
+_Version 0.9_
   * First release! 
 
 ## Examples
