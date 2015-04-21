@@ -25,10 +25,22 @@ setting everything up.
 
 ![Party On Wayne](http://data.whicdn.com/images/24796384/tumblr_m0ng6rBeWT1qhd0xso1_500_large.jpg)
 
+## Changelog
+*Version 1.1.0*
+  * Minor Updates to support changes in counterpartyd 1.1
+  * Removed support for relaying transactions through counterparty
+  * Implemented bitcoin-ruby based transaction signing
+  * Added a blockr.io library for relaying signed transactions
+  * save() syntax now requires that a private key be provided to persist transactions
+  * Default test and production counterparty servers were changed to the vennd.io public servers
+
+*Version 0.9*
+  * First release! 
+
 ## Examples
 Documentation on the objects is available via:
   * [counterparty_ruby's rubydoc](http://www.rubydoc.info/github/brighton36/counterparty_ruby/master), 
-  * [The Counterparty official API guide](https://github.com/CounterpartyXCP/counterpartyd/blob/master/docs/API.rst#read-api-function-reference).
+  * [The Counterparty official API guide](http://counterparty.io/docs/api/).
 
 #### Find the first burn
 Here we retrieve burns from the blockchain using ActiveRecord style method calls.
@@ -240,7 +252,7 @@ the serpent CLI executable is installed on the running system
   ```
 
 ## Have questions?
-The _best_ place to start is the [Counterparty API reference](https://github.com/CounterpartyXCP/counterpartyd/blob/master/docs/API.rst#read-api-function-reference).
+The _best_ place to start is the [Counterparty API reference](http://counterparty.io/docs/api/).
 You'll soon find that this gem is merely a wrapper around the official 
 counterpartyd json API.
 

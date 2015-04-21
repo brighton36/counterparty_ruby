@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    counterparty_ruby (0.9.0)
+    counterparty_ruby (1.1.0)
       bitcoin-ruby
       ffi
       rest-client
