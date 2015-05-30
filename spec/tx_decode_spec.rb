@@ -3,6 +3,7 @@ require_relative 'spec_helper'
 
 # deweller provided some nice unit tests for enconding/decoding transactions. 
 # These examples were lifted from there.
+# raw_tx = BlockrIo.new.getrawtransaction ''
 describe Counterparty::TxDecode do
   # This converts the tokenly-unit test hash into what bitcoin-ruby expects:
   def tokenly_json_to_hash(json)
@@ -66,7 +67,7 @@ describe Counterparty::TxDecode do
       #   eae1fd843f267d756c765b3e84ff33cd3f7dcde4df671c53b2e3465ba9f1b94e
 
       #raw_tx = BlockrIo.new.getrawtransaction random_cp_broadcast
-      random_cp_broadcast_raw_tx = '0100000001c77af36618fa11f91152608a6ed50'+
+      raw_tx = '0100000001c77af36618fa11f91152608a6ed50'+
         'eab0fed0c9ace1a1f60444e8abb15d5cdd6010000006b4830450220243fa1706a7'+
         '708ffa5313a04935fd543f5fd04d43f3f8d6c46e94502dfabcb08022100a682848'+
         'c79356ab47e17b3f10ed91e45c72ad0fc866c2e4a4bb25826ef9ac00f01210216b'+
@@ -82,11 +83,93 @@ describe Counterparty::TxDecode do
         'c00000000'
     
 
-      tx = Bitcoin::P::Tx.new [random_cp_broadcast_raw_tx].pack('H*')
+      tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
       record = Counterparty::TxDecode.new tx
       
       expect(record.data).to eq("\x00\x00\x00\x1EUT\xA9\xA2\xBF\xF0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00(BLOCKSCAN VERIFY-ADDRESS 4mmqa6iccbrrgky\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".force_encoding('ASCII-8BIT'))
-      expect(record.destination).to eq(nil)
+      expect(record.destination).to eq('1HARUMuoSXftAwY6jxMUutc9uKSCK9zxzF')
+    end
+
+    it "decodes a pubkeyhash encoding" do
+      # This was from Txid:
+      #   '76133a842ced8d76047e070924bca66652b19581803079f200d35fd824499940'
+      raw_tx = '01000000011b4e667cf0b715fa95be6baa6b505'+
+        '78fd9c3fa15fb0a5554aeb5f3991e672c64010000006a47304402204dea7f4824a'+
+        'c40fc501fab3e341c2e47670a81b38820854b6f5540c673945a8a0220110446d7a'+
+        '4e76df07041ef76f137485f0d0fd9114d612e784e2721954129c48701210321bab'+
+        '6d17f75ebbbdd71793fa9c1136b537e5679ea2fc153fa1cb0884d038834fffffff'+
+        'f0436150000000000001976a914748e483222863a836a421df1a9395bbd835bdfd'+
+        'a88ac36150000000000001976a91461e09442c872dabb980a7a86a04323a62512e'+
+        'c5d88ac36150000000000001976a91463e09442c872dabb98467a86a0432653c40'+
+        'c96c088ac20867700000000001976a914ce27246a0a6ca54dfa1f780ccd5cb3d0c'+
+        '73a75b288ac00000000'
+
+      tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
+      record = Counterparty::TxDecode.new tx
+      expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x1Ez\x9DL\x00\x00\x00\x00\x05\xF5\xE1\x00".force_encoding('ASCII-8BIT'))
+      expect(record.destination).to eq('1BdHqBSfUqv77XtBSeofH6XwHHczZxKRUF')
+    end
+
+    it "decodes these weird two output OP_RETURNs" do
+      # The reason this is a weird transaction is 
+      # because the size of the inputs happens to equal dust_size + tx fee
+      #
+      # This was from Txid:
+      #   '05f89f3538e762c534fa9c65200c115b9796386ce2eb8f88f3d7b430873ec302'
+      raw_tx = '010000000341ba60588bdf72c63ae3641767f59'+
+        '5be991e8c70bf970b658d48c2a3446d367a000000006b483045022100c8f219137'+
+        '6cc2c0235d8cd66e429fbd7bb0cbe410e35359d6a1a27b903345f1d0220696f72e'+
+        'af67f3bfe96fc7504fe1b9d5455bdde45dba127a1e082152c056706bc012102724'+
+        '0dfe6f1b45e009812b9bf0b1dce959f3313e28140185800c9fec814f00351fffff'+
+        'fff713f469f416cd52270f756373d6da00b6829b88240d7aa9f74464f0e77df836'+
+        'a000000006b483045022100a8da4b96afe2a70c69fa9aacf186e2ba0ed03782bd7'+
+        'b4fe70e3e75a4ed62380e02206964db4f0d19a9ed4753ecbd8685fdb6e45e23611'+
+        '7ec4eeaca968acb781d9b110121027240dfe6f1b45e009812b9bf0b1dce959f331'+
+        '3e28140185800c9fec814f00351ffffffffcdd532ffa6e5742ca99bd5f713777d3'+
+        'b6569152a813e3b351ccb9da82abe456d000000006b48304502210093c57cd43cc'+
+        'ca9a9c7743341c23bba532dc9025f8f4fea7c02d56a4197e2737802207e4a8dec6'+
+        '5efe31fef6e9297698207b5d09f8729974a90e70ff85b1ee6029d670121027240d'+
+        'fe6f1b45e009812b9bf0b1dce959f3313e28140185800c9fec814f00351fffffff'+
+        'f0256400000000000001976a9148c2e9372962ce45c5c2f33479499314a71e6ea3'+
+        'd88ac00000000000000001e6a1c00d0dd53993819edb255fc6e348bfcb2092d896'+
+        '9d012da6183f8ec6100000000'
+
+      tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
+      record = Counterparty::TxDecode.new tx
+      expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x05\xF5\xE1\x00".force_encoding('ASCII-8BIT'))
+      expect(record.destination).to eq('1DnDQ1ef1eCuFcexZn1wqXFdtbFTQqE9LH')
+    end
+    
+    it "decodes a four output pubkeyhash" do
+      # This was from Txid:
+      #   '76133a842ced8d76047e070924bca66652b19581803079f200d35fd824499940'
+      raw_tx = '01000000011b4e667cf0b715fa95be6baa6b505'+
+        '78fd9c3fa15fb0a5554aeb5f3991e672c64010000006a47304402204dea7f4824a'+
+        'c40fc501fab3e341c2e47670a81b38820854b6f5540c673945a8a0220110446d7a'+
+        '4e76df07041ef76f137485f0d0fd9114d612e784e2721954129c48701210321bab'+
+        '6d17f75ebbbdd71793fa9c1136b537e5679ea2fc153fa1cb0884d038834fffffff'+
+        'f0436150000000000001976a914748e483222863a836a421df1a9395bbd835bdfd'+
+        'a88ac36150000000000001976a91461e09442c872dabb980a7a86a04323a62512e'+
+        'c5d88ac36150000000000001976a91463e09442c872dabb98467a86a0432653c40'+
+        'c96c088ac20867700000000001976a914ce27246a0a6ca54dfa1f780ccd5cb3d0c'+
+        '73a75b288ac00000000'
+
+      tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
+      record = Counterparty::TxDecode.new tx
+      expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x1Ez\x9DL\x00\x00\x00\x00\x05\xF5\xE1\x00".force_encoding('ASCII-8BIT'))
+      expect(record.destination).to eq('1BdHqBSfUqv77XtBSeofH6XwHHczZxKRUF')
+    end
+
+    it "decodes the mother of all multisig broadcasts" do
+      # This was from Txid:
+      #   '14200afba2c8f91664afc37143763e5987a20647db3443c999137cc41b4db6e4'
+      # This transaction was enormous, so I'm just going to pull it from the web:
+      raw_tx = BlockrIo.new.getrawtransaction '14200afba2c8f91664afc37143763e5987a20647db3443c999137cc41b4db6e4'
+
+      tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
+      record = Counterparty::TxDecode.new tx
+      expect(record.data).to eq("\x00\x00\x00\x1EUj\x18\xE0\xBF\xF0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00Commerce on the Internet has come to rely almost exclusively on financial institutions serving as trusted third parties to process electronic payments. While the system works well enough for most transactions, it still suffers from the inherent weaknesses of the trust based model. Completely non-reversible transactions are not really possible, since financial institutions cannot avoid mediating disputes. The cost of mediation increases transaction costs, limiting the minimum practical transaction size and cutting off the possibility for small casual transactions, and there is a broader cost in the loss of ability to make non-reversible payments for nonreversible services. With the possibility of reversal, the need for trust spreads. Merchants must be wary of their customers, hassling them for more information than they would otherwise need. A certain percentage of fraud is accepted as unavoidable. These costs and payment uncertainties can be avoided in person by using physical currency, but no mechanism exists to make payments over a communications channel without a trusted party. What is needed is an electronic payment system based on cryptographic proof instead of trust, allowing any two willing parties to transact directly with each other without the need for a trusted third party. Transactions that are computationally impractical to reverse would protect sellers from fraud, and routine escrow mechanisms could easily be implemented to protect buyers. In this paper, we propose a solution to the double-spending problem using a peer-to-peer distributed timestamp server to generate computational proof of the chronological order of transactions. The system is secure as long as honest nodes collectively control more CPU power than any cooperating group of attacker nodes.\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".force_encoding('ASCII-8BIT'))
+      expect(record.destination).to eq('186sRhi5Ux1eKGzx5vRdq1ueGGB5NKLKRr')
     end
 
   end

@@ -1,6 +1,5 @@
 # Inspriration heavily lifted from: 
 # - https://github.com/CounterpartyXCP/counterparty-lib/blob/master/counterpartylib/lib/transaction.py
-# Binary data to to bitcoin transaction encoder class/utility
 class Counterparty::TxEncode
   class MissingPubkey < StandardError; end
   class MissingSenderAddr < StandardError; end
@@ -122,9 +121,4 @@ class Counterparty::TxEncode
     ret
   end
 
-  # TODO: 
-  def self.create_tx
-    # Roll up the encoding of multiple outputs into a transaction
-
-  end
 end

@@ -4,7 +4,7 @@ class Counterparty::TxDecode
   DEFAULT_PREFIX = 'CNTRPRTY' #TODO: Add the version stuff here
 
   OP_RETURN_PARTS = /^OP_RETURN ([a-z0-9]+)$/
-  OP_CHECKSIG_PARTS = /^OP_DUP OP_HASH160 ([a-z0-9]+) OP_EQUALVERIFY OP_CHECKSIG$/
+  P2PKH_PARTS = /^OP_DUP OP_HASH160 ([a-z0-9]+) OP_EQUALVERIFY OP_CHECKSIG$/
   OP_MULTISIG_PARTS = /^1 ([a-z0-9 ]+) ([23]) OP_CHECKMULTISIG$/
 
   attr_accessor :destination, :data, :prefix
@@ -12,6 +12,15 @@ class Counterparty::TxDecode
   def initialize(tx, prefix = DEFAULT_PREFIX) # TODO: Make this an option
     @tx, @prefix = tx, prefix
     parse!
+  end
+
+  # TODO: Remove the @destination entirely
+  def receiver_addr
+    @destination
+  end
+
+  def sender_addr
+    # TODO: might want/need the pubkey even
   end
    
   def decrypt_key
@@ -28,6 +37,24 @@ class Counterparty::TxDecode
 
   private
 
+=begin
+  def parse!
+    sender, op, @destination = p2pkh_unwrap tx_out
+
+    @tx.outputs.length
+    case op
+      when OP_RETURN_PARTS
+        data_from_opreturn $1
+      when OP_MULTISIG_PARTS
+        data_from_opcheckmultisig $1, $2
+    end
+  end
+
+  def p2pkh_unwrap(tx)
+    # data_from_opchecksig $1
+  end
+=end
+
   def parse!
     return if @data
 
@@ -36,7 +63,7 @@ class Counterparty::TxDecode
       new_destination, new_data = case out.parsed_script.to_string
         when OP_RETURN_PARTS
           data_from_opreturn $1
-        when OP_CHECKSIG_PARTS
+        when P2PKH_PARTS
           data_from_opchecksig $1
         when OP_MULTISIG_PARTS
           data_from_opcheckmultisig $1, $2
@@ -83,13 +110,10 @@ class Counterparty::TxDecode
     chunk = decrypt [pubkeyhash_text].pack('H*')
 
     if (chunk[1..prefix.length] == prefix) 
-      raise StandardError, "TODO: This Codepath is untested"
-      # TODO:
-      # $data_chunk_length = $chunk[0];
-      # $data_chunk = substr($chunk, 1, $data_chunk_length + 1);
-      # $data = substr($data_chunk, 8);
+      chunk_length = chunk[0].ord
+      data = chunk[(1+prefix.length)...chunk_length+1]
 
-      # [nil, data]
+      [nil, data]
     else
       [Bitcoin.hash160_to_address(pubkeyhash_text), nil]
     end
