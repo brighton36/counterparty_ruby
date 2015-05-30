@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 1.9'
   gem.license       = 'LGPL'
 
-  ['rest-client', 'bitcoin-ruby', 'ffi'].each do |dependency|
+  ['rest-client', 'bitcoin-ruby', 'ffi', 'ruby-rc4'].each do |dependency|
     gem.add_runtime_dependency dependency
   end
   ['rspec', 'rspec-its', 'rake', 'rdoc'].each do |dependency|

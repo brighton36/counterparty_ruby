@@ -1,3 +1,9 @@
+GIT
+  remote: https://github.com/lian/bitcoin-ruby
+  revision: 69123208d45a19da446c5e0079d4fa2e225e5be6
+  specs:
+    bitcoin-ruby (0.0.6)
+
 PATH
   remote: .
   specs:
@@ -5,19 +11,19 @@ PATH
       bitcoin-ruby
       ffi
       rest-client
+      ruby-rc4
 
 GEM
   remote: https://rubygems.org/
   specs:
-    bitcoin-ruby (0.0.6)
     diff-lcs (1.2.5)
-    domain_name (0.5.23)
+    domain_name (0.5.24)
       unf (>= 0.0.5, < 1.0.0)
     ffi (1.9.8)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
     json (1.8.1)
-    mime-types (2.4.3)
+    mime-types (2.5)
     netrc (0.10.3)
     rake (10.3.2)
     rdoc (4.2.0)
@@ -41,14 +47,16 @@ GEM
     rspec-mocks (3.1.3)
       rspec-support (~> 3.1.0)
     rspec-support (3.1.2)
+    ruby-rc4 (0.1.5)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.6)
+    unf_ext (0.0.7.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  bitcoin-ruby!
   counterparty_ruby!
   rake
   rdoc
