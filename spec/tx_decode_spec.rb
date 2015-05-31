@@ -28,8 +28,8 @@ describe Counterparty::TxDecode do
       record = Counterparty::TxDecode.new tx
       
       expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\xFA\xDF\x00\x00\x00\x17Hv\xE8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".force_encoding('ASCII-8BIT'))
-      expect(record.destination).to eq('12pv1K6LTLPFYXcCwsaU7VWYRSX7BuiF28')
-
+      expect(record.receiver_addr).to eq('12pv1K6LTLPFYXcCwsaU7VWYRSX7BuiF28')
+      expect(record.sender_addr).to eq('1AuTJDwH6xNqxRLEjPB7m86dgmerYVQ5G1')
     end
 
     it "Tokenly's getSampleCounterpartyTransaction3()" do
@@ -39,7 +39,8 @@ describe Counterparty::TxDecode do
       record = Counterparty::TxDecode.new tx
       
       expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\xFA\xDF\x00\x00\x00\x00\v\xEB\xC2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".force_encoding('ASCII-8BIT'))
-      expect(record.destination).to eq('1FEbYaghvr7V53B9csjQTefUtBBQTaDFvN')
+      expect(record.receiver_addr).to eq('1FEbYaghvr7V53B9csjQTefUtBBQTaDFvN')
+      expect(record.sender_addr).to eq('1291Z6hofAAvH8E886cN9M5uKB1VvwBnup')
     end
 
 
@@ -59,14 +60,14 @@ describe Counterparty::TxDecode do
       record = Counterparty::TxDecode.new tx
       
       expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\xFA\xDF\x00\x00\x00\x01*\x05\xF2\x00".force_encoding('ASCII-8BIT'))
-      expect(record.destination).to eq('1KUsjZKrkd7LYRV7pbnNJtofsq1HAiz6MF')
+      expect(record.receiver_addr).to eq('1KUsjZKrkd7LYRV7pbnNJtofsq1HAiz6MF')
+      expect(record.sender_addr).to eq('12iVwKP7jCPnuYy7jbAbyXnZ3FxvgLwvGK')
     end
 
     it "decodes a random counterparty transaction" do
       # This was from a random Counterparty Broadcast. Txid:
       #   eae1fd843f267d756c765b3e84ff33cd3f7dcde4df671c53b2e3465ba9f1b94e
 
-      #raw_tx = BlockrIo.new.getrawtransaction random_cp_broadcast
       raw_tx = '0100000001c77af36618fa11f91152608a6ed50'+
         'eab0fed0c9ace1a1f60444e8abb15d5cdd6010000006b4830450220243fa1706a7'+
         '708ffa5313a04935fd543f5fd04d43f3f8d6c46e94502dfabcb08022100a682848'+
@@ -87,7 +88,8 @@ describe Counterparty::TxDecode do
       record = Counterparty::TxDecode.new tx
       
       expect(record.data).to eq("\x00\x00\x00\x1EUT\xA9\xA2\xBF\xF0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00(BLOCKSCAN VERIFY-ADDRESS 4mmqa6iccbrrgky\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".force_encoding('ASCII-8BIT'))
-      expect(record.destination).to eq('1HARUMuoSXftAwY6jxMUutc9uKSCK9zxzF')
+      expect(record.sender_addr).to eq('1HARUMuoSXftAwY6jxMUutc9uKSCK9zxzF')
+      expect(record.receiver_addr).to be_nil
     end
 
     it "decodes a pubkeyhash encoding" do
@@ -107,7 +109,8 @@ describe Counterparty::TxDecode do
       tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
       record = Counterparty::TxDecode.new tx
       expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x1Ez\x9DL\x00\x00\x00\x00\x05\xF5\xE1\x00".force_encoding('ASCII-8BIT'))
-      expect(record.destination).to eq('1BdHqBSfUqv77XtBSeofH6XwHHczZxKRUF')
+      expect(record.receiver_addr).to eq('1BdHqBSfUqv77XtBSeofH6XwHHczZxKRUF')
+      expect(record.sender_addr).to eq('1Ko36AjTKYh6EzToLU737Bs2pxCsGReApK')
     end
 
     it "decodes these weird two output OP_RETURNs" do
@@ -137,7 +140,8 @@ describe Counterparty::TxDecode do
       tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
       record = Counterparty::TxDecode.new tx
       expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x05\xF5\xE1\x00".force_encoding('ASCII-8BIT'))
-      expect(record.destination).to eq('1DnDQ1ef1eCuFcexZn1wqXFdtbFTQqE9LH')
+      expect(record.receiver_addr).to eq('1DnDQ1ef1eCuFcexZn1wqXFdtbFTQqE9LH')
+      expect(record.sender_addr).to be_nil
     end
     
     it "decodes a four output pubkeyhash" do
@@ -157,7 +161,8 @@ describe Counterparty::TxDecode do
       tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
       record = Counterparty::TxDecode.new tx
       expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x1Ez\x9DL\x00\x00\x00\x00\x05\xF5\xE1\x00".force_encoding('ASCII-8BIT'))
-      expect(record.destination).to eq('1BdHqBSfUqv77XtBSeofH6XwHHczZxKRUF')
+      expect(record.receiver_addr).to eq('1BdHqBSfUqv77XtBSeofH6XwHHczZxKRUF')
+      expect(record.sender_addr).to eq('1Ko36AjTKYh6EzToLU737Bs2pxCsGReApK')
     end
 
     it "decodes the mother of all multisig broadcasts" do
@@ -169,7 +174,8 @@ describe Counterparty::TxDecode do
       tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
       record = Counterparty::TxDecode.new tx
       expect(record.data).to eq("\x00\x00\x00\x1EUj\x18\xE0\xBF\xF0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00Commerce on the Internet has come to rely almost exclusively on financial institutions serving as trusted third parties to process electronic payments. While the system works well enough for most transactions, it still suffers from the inherent weaknesses of the trust based model. Completely non-reversible transactions are not really possible, since financial institutions cannot avoid mediating disputes. The cost of mediation increases transaction costs, limiting the minimum practical transaction size and cutting off the possibility for small casual transactions, and there is a broader cost in the loss of ability to make non-reversible payments for nonreversible services. With the possibility of reversal, the need for trust spreads. Merchants must be wary of their customers, hassling them for more information than they would otherwise need. A certain percentage of fraud is accepted as unavoidable. These costs and payment uncertainties can be avoided in person by using physical currency, but no mechanism exists to make payments over a communications channel without a trusted party. What is needed is an electronic payment system based on cryptographic proof instead of trust, allowing any two willing parties to transact directly with each other without the need for a trusted third party. Transactions that are computationally impractical to reverse would protect sellers from fraud, and routine escrow mechanisms could easily be implemented to protect buyers. In this paper, we propose a solution to the double-spending problem using a peer-to-peer distributed timestamp server to generate computational proof of the chronological order of transactions. The system is secure as long as honest nodes collectively control more CPU power than any cooperating group of attacker nodes.\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".force_encoding('ASCII-8BIT'))
-      expect(record.destination).to eq('186sRhi5Ux1eKGzx5vRdq1ueGGB5NKLKRr')
+      expect(record.sender_addr).to eq('186sRhi5Ux1eKGzx5vRdq1ueGGB5NKLKRr')
+      expect(record.receiver_addr).to be_nil
     end
 
   end

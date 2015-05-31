@@ -1,26 +1,24 @@
 # Inspriration heavily lifted from: 
 # - https://github.com/tokenly/counterparty-transaction-parser
 class Counterparty::TxDecode
-  DEFAULT_PREFIX = 'CNTRPRTY' #TODO: Add the version stuff here
+  # If you find one of these, send that txid to me:
+  class UndefinedBehavior < StandardError; end
+  class InvalidOpReturn < StandardError; end
+  class InvalidOutput < StandardError; end
+
+  DEFAULT_PREFIX = 'CNTRPRTY'
 
   OP_RETURN_PARTS = /^OP_RETURN ([a-z0-9]+)$/
   P2PKH_PARTS = /^OP_DUP OP_HASH160 ([a-z0-9]+) OP_EQUALVERIFY OP_CHECKSIG$/
   OP_MULTISIG_PARTS = /^1 ([a-z0-9 ]+) ([23]) OP_CHECKMULTISIG$/
 
-  attr_accessor :destination, :data, :prefix
+  attr_accessor :sender_addr, :receiver_addr, :destination, :data, :prefix
 
-  def initialize(tx, prefix = DEFAULT_PREFIX) # TODO: Make this an option
+  def initialize(tx, prefix = DEFAULT_PREFIX)
     @tx, @prefix = tx, prefix
-    parse!
-  end
-
-  # TODO: Remove the @destination entirely
-  def receiver_addr
-    @destination
-  end
-
-  def sender_addr
-    # TODO: might want/need the pubkey even
+    parse! (tx.respond_to? :outputs) ? 
+      @tx.outputs.collect{|out| out.parsed_script.to_string } :
+      tx
   end
    
   def decrypt_key
@@ -31,92 +29,66 @@ class Counterparty::TxDecode
     RC4.new(decrypt_key).decrypt chunk
   end
 
-  def encoding_type
-    # TODO: Return one of : multisig, opreturn, pubkeyhash
-  end
-
   private
 
-=begin
-  def parse!
-    sender, op, @destination = p2pkh_unwrap tx_out
-
-    @tx.outputs.length
-    case op
-      when OP_RETURN_PARTS
-        data_from_opreturn $1
-      when OP_MULTISIG_PARTS
-        data_from_opcheckmultisig $1, $2
-    end
+  def prefixed?(data, offset = 1)
+    data[offset...(prefix.length+offset)] == prefix
   end
 
-  def p2pkh_unwrap(tx)
-    # data_from_opchecksig $1
+  # This determines if the supplied operation is a non-data 
+  def is_non_prefixed_p2pkh?(op)
+    P2PKH_PARTS.match(op) && !prefixed?(decrypt([$1].pack('H*')))
   end
-=end
 
-  def parse!
+  def hash160_from_p2pkh(op)
+    Bitcoin.hash160_to_address $1 if P2PKH_PARTS.match op
+  end
+
+  # Note that this isn't exactly the way counterparty parses the transactions. 
+  # But , it reads cleaner, and worked on every transaction I could find. 
+  # Mostly the difference is that the counterparty version is a loop that 
+  # collects P2PKH's anywhere in the outputs, whereas this block takes a sender
+  # or receiver address from the top and bottom only
+  def parse!(outputs)
     return if @data
+    
+    # So typically, the first output is a P2PKH with the receiver address:
+    @receiver_addr = hash160_from_p2pkh(outputs.shift) if is_non_prefixed_p2pkh? outputs.first
 
-    destinations = []
-    @data = @tx.outputs.inject(''){ |data, out|
-      new_destination, new_data = case out.parsed_script.to_string
-        when OP_RETURN_PARTS
-          data_from_opreturn $1
-        when P2PKH_PARTS
-          data_from_opchecksig $1
-        when OP_MULTISIG_PARTS
-          data_from_opcheckmultisig $1, $2
-      end
+    # Parse the sender address:
+    @sender_addr = hash160_from_p2pkh(outputs.pop) if is_non_prefixed_p2pkh? outputs.last
 
-      raise StandardError, 'Found new destination and new data' if new_destination && new_data
-      raise StandardError, 'Did not find destination or data' unless new_destination || new_data
-
-      # All destinations come before all data.
-      if (data.empty? && new_data.nil?)
-        destinations << new_destination;
-      elsif new_destination.nil?
-        data += new_data
-      end
-
-      data
-    }
-
-    @destination = case destinations.length
-      when 0
-        nil
-      when 1
-        destinations.first
-      else
-        raise StandardError, "Too many destinations parsed" if destinations.length > 1
-    end
+    @data = outputs.collect{|out|
+      # This weirdo line will send the regex matches to the operation handler
+      # that matches the line
+      send (case out
+        when OP_RETURN_PARTS then :data_from_opreturn
+        when P2PKH_PARTS then :data_from_opchecksig
+        when OP_MULTISIG_PARTS then :data_from_opcheckmultisig
+        else raise InvalidOutput
+      end), *$~.to_a[1..-1]
+    }.join
   end
 
   def data_from_opreturn(data)
     chunk = [data].pack('H*')
     
-    raise StandardError "Invalid OP_RETURN" if chunk.nil?
+    raise InvalidOpReturn if chunk.nil?
 
     data = decrypt chunk
 
-    raise StandardError "unrecognized OP_RETURN output" unless data[0...prefix.length] == prefix
+    raise InvalidOpReturn unless prefixed?(data,0)
 
-    data = data[prefix.length..-1]
-
-    [nil, data]
+    data[prefix.length..-1]
   end
 
   def data_from_opchecksig(pubkeyhash_text)
     chunk = decrypt [pubkeyhash_text].pack('H*')
 
-    if (chunk[1..prefix.length] == prefix) 
-      chunk_length = chunk[0].ord
-      data = chunk[(1+prefix.length)...chunk_length+1]
+    raise UndefinedBehavior unless prefixed? chunk
 
-      [nil, data]
-    else
-      [Bitcoin.hash160_to_address(pubkeyhash_text), nil]
-    end
+    chunk_length = chunk[0].ord
+    chunk[(1+prefix.length)...chunk_length+1]
   end
 
   def data_from_opcheckmultisig(pubkeys_op, n_signatures_op)
@@ -129,25 +101,14 @@ class Counterparty::TxDecode
 
     data = decrypt chunk
 
-    if (data[1..prefix.length] == prefix) 
-      # Padding byte in each output (instead of just in the last one) so that 
-      # encoding methods may be mixed. Also, it’s just not very much data.
+    # So, I think that multisig transactions will break here. I haven't actually
+    # tested/found one though, so ATM non-prefix'd multisigs will bork
+    raise UndefinedBehavior unless prefixed? data
 
-      chunk_length = data[0..1].unpack('c*')[1]
+    # Padding byte in each output (instead of just in the last one) so that 
+    # encoding methods may be mixed. Also, it’s just not very much data.
+    chunk_length = data[0..1].unpack('c*')[1]
 
-      data = data[1..chunk_length]
-      data = data[prefix.length..-1]
-      [nil, data]
-    else
-      raise StandardError, "TODO: This Codepath is untested" 
-      # TODO: 
-      # $pubkeyhashes = [];
-      # foreach($pubkeys as $pubkey) {
-          #$pubkeyhashes[] = self::pubkey_to_pubkeyhash($pubkey);
-      # }
-      # $destination = implode('_', array_merge([$sig_n], $pubkeyhashes, [count($pubkeyhashes)]));
-
-      # [destination, nil]
-    end
+    data[1..chunk_length][prefix.length..-1]
   end
 end
