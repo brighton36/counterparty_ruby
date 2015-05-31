@@ -27,7 +27,7 @@ describe Counterparty::TxDecode do
       tx = Bitcoin::P::Tx.from_hash( tokenly_json_to_hash(json) )
       record = Counterparty::TxDecode.new tx
       
-      expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\xFA\xDF\x00\x00\x00\x17Hv\xE8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".force_encoding('ASCII-8BIT'))
+      expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\xFA\xDF\x00\x00\x00\x17Hv\xE8\x00".force_encoding('ASCII-8BIT'))
       expect(record.receiver_addr).to eq('12pv1K6LTLPFYXcCwsaU7VWYRSX7BuiF28')
       expect(record.sender_addr).to eq('1AuTJDwH6xNqxRLEjPB7m86dgmerYVQ5G1')
     end
@@ -38,7 +38,7 @@ describe Counterparty::TxDecode do
       tx = Bitcoin::P::Tx.from_hash( tokenly_json_to_hash(json) )
       record = Counterparty::TxDecode.new tx
       
-      expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\xFA\xDF\x00\x00\x00\x00\v\xEB\xC2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".force_encoding('ASCII-8BIT'))
+      expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\xFA\xDF\x00\x00\x00\x00\v\xEB\xC2\x00".force_encoding('ASCII-8BIT'))
       expect(record.receiver_addr).to eq('1FEbYaghvr7V53B9csjQTefUtBBQTaDFvN')
       expect(record.sender_addr).to eq('1291Z6hofAAvH8E886cN9M5uKB1VvwBnup')
     end
@@ -87,7 +87,7 @@ describe Counterparty::TxDecode do
       tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
       record = Counterparty::TxDecode.new tx
       
-      expect(record.data).to eq("\x00\x00\x00\x1EUT\xA9\xA2\xBF\xF0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00(BLOCKSCAN VERIFY-ADDRESS 4mmqa6iccbrrgky\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".force_encoding('ASCII-8BIT'))
+      expect(record.data).to eq("\x00\x00\x00\x1EUT\xA9\xA2\xBF\xF0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00(BLOCKSCAN VERIFY-ADDRESS 4mmqa6iccbrrgky".force_encoding('ASCII-8BIT'))
       expect(record.sender_addr).to eq('1HARUMuoSXftAwY6jxMUutc9uKSCK9zxzF')
       expect(record.receiver_addr).to be_nil
     end
@@ -160,6 +160,7 @@ describe Counterparty::TxDecode do
 
       tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
       record = Counterparty::TxDecode.new tx
+      
       expect(record.data).to eq("\x00\x00\x00\x00\x00\x00\x00\x00\x1Ez\x9DL\x00\x00\x00\x00\x05\xF5\xE1\x00".force_encoding('ASCII-8BIT'))
       expect(record.receiver_addr).to eq('1BdHqBSfUqv77XtBSeofH6XwHHczZxKRUF')
       expect(record.sender_addr).to eq('1Ko36AjTKYh6EzToLU737Bs2pxCsGReApK')
@@ -173,11 +174,32 @@ describe Counterparty::TxDecode do
 
       tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
       record = Counterparty::TxDecode.new tx
-      expect(record.data).to eq("\x00\x00\x00\x1EUj\x18\xE0\xBF\xF0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00Commerce on the Internet has come to rely almost exclusively on financial institutions serving as trusted third parties to process electronic payments. While the system works well enough for most transactions, it still suffers from the inherent weaknesses of the trust based model. Completely non-reversible transactions are not really possible, since financial institutions cannot avoid mediating disputes. The cost of mediation increases transaction costs, limiting the minimum practical transaction size and cutting off the possibility for small casual transactions, and there is a broader cost in the loss of ability to make non-reversible payments for nonreversible services. With the possibility of reversal, the need for trust spreads. Merchants must be wary of their customers, hassling them for more information than they would otherwise need. A certain percentage of fraud is accepted as unavoidable. These costs and payment uncertainties can be avoided in person by using physical currency, but no mechanism exists to make payments over a communications channel without a trusted party. What is needed is an electronic payment system based on cryptographic proof instead of trust, allowing any two willing parties to transact directly with each other without the need for a trusted third party. Transactions that are computationally impractical to reverse would protect sellers from fraud, and routine escrow mechanisms could easily be implemented to protect buyers. In this paper, we propose a solution to the double-spending problem using a peer-to-peer distributed timestamp server to generate computational proof of the chronological order of transactions. The system is secure as long as honest nodes collectively control more CPU power than any cooperating group of attacker nodes.\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".force_encoding('ASCII-8BIT'))
+
+      expect(record.data).to eq("\x00\x00\x00\x1EUj\x18\xE0\xBF\xF0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00Commerce on the Internet has come to rely almost exclusively on financial institutions serving as trusted third parties to process electronic payments. While the system works well enough for most transactions, it still suffers from the inherent weaknesses of the trust based model. Completely non-reversible transactions are not really possible, since financial institutions cannot avoid mediating disputes. The cost of mediation increases transaction costs, limiting the minimum practical transaction size and cutting off the possibility for small casual transactions, and there is a broader cost in the loss of ability to make non-reversible payments for nonreversible services. With the possibility of reversal, the need for trust spreads. Merchants must be wary of their customers, hassling them for more information than they would otherwise need. A certain percentage of fraud is accepted as unavoidable. These costs and payment uncertainties can be avoided in person by using physical currency, but no mechanism exists to make payments over a communications channel without a trusted party. What is needed is an electronic payment system based on cryptographic proof instead of trust, allowing any two willing parties to transact directly with each other without the need for a trusted third party. Transactions that are computationally impractical to reverse would protect sellers from fraud, and routine escrow mechanisms could easily be implemented to protect buyers. In this paper, we propose a solution to the double-spending problem using a peer-to-peer distributed timestamp server to generate computational proof of the chronological order of transactions. The system is secure as long as honest nodes collectively control more CPU power than any cooperating group of attacker nodes.".force_encoding('ASCII-8BIT'))
       expect(record.sender_addr).to eq('186sRhi5Ux1eKGzx5vRdq1ueGGB5NKLKRr')
       expect(record.receiver_addr).to be_nil
     end
 
+    it "doesn't support multisig transactions ATM" do
+      # Txid:
+      # d4153cb6c3756d5198af15a018f50731dcdacae86d5448c7404b7e42adf59942
+
+      raw_tx = '010000000145a4f089931f677dd5c97c7c5de6e2e748c431726d0a9dc8b200df4250'+
+        '596768020000006b483045022100fd881b69b1572587c224e7bf79bc7aba96447946cecb1fb'+
+        '66f7c4a7ac140881c022030f91bb9a9c119c8ccf9fdf7d86d123a5c3e791fecc3578433db39'+
+        'b54fed674c01210202baab55d662c40f5846da3ac914fef8acc4c2932dac0120808c3fcc583'+
+        'ad0efffffffff03781e000000000000c95241047664bc75c1eb2df0082e6753fa01fe3ed690'+
+        '012236d9629d9e754dc63b540634c5db95700fa337c4e2374519d357ebc4fa2a69b02f30aa9'+
+        '2988afdaaad2a2e314104cb88f386eccbccb0b847b69e6ef3570ad5ce2397cd6bd74cd448d1'+
+        'a5de31a5a3e7deadb446bcb25df8ecf45b3aad234e16183b71c2621829572e268c18ccb72f4'+
+        '104fb41fed5c73b3fa08f8be7e31982f4fb490d0d5017a65c2ebf0a0bbb930ceff7dba3581c'+
+        '941a71035f5a06254364d9deb6de40c1626e10205f840ab11315904c53ae000000000000000'+
+        '01e6a1c593b2c1d8269aa039023b56b6487bf8dbedc7b880f42bddbe7388989de7f0b000000'+
+        '00001976a9149583a3a598b987d5fa27eae2dc27f004b11277b988ac00000000'
+
+      tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
+      expect{ Counterparty::TxDecode.new tx }.to raise_error(::Counterparty::TxDecode::MultisigUnsupported)
+    end
   end
 end
 

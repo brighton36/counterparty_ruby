@@ -1,3 +1,5 @@
+#encoding: utf-8
+
 # Inspriration heavily lifted from: 
 # - https://github.com/CounterpartyXCP/counterparty-lib/blob/master/counterpartylib/lib/transaction.py
 class Counterparty::TxEncode
@@ -15,65 +17,66 @@ class Counterparty::TxEncode
 
   # 33 is the size of a pubkey, there are two pubkeys in a multisig, 1 byte
   # is lost for the data length byte, and two bytes are lost on each key for
-  # the make_fully_valid inefficiency
+  # the data_to_pubkey inefficiency
   BYTES_IN_MULTISIG = (33 * 2) - 1 - 2 - 2
-
+  BYTES_IN_PUBKEYHASH = 20 - 1
   BYTES_IN_OPRETURN = 40
 
   attr_accessor :sender_addr, :sender_pubkey, :receiver_addr, :encrypt_key, 
     :source_data, :prefix
   
-  def initialize(receiver_addr, encrypt_key, source_data, options = {})
-    @receiver_addr, @source_data, @encrypt_key = receiver_addr, source_data, 
-      encrypt_key
-
-    if options[:sender_privkey]
-      # We don't need to store the privkey, but we do need to generate its pub
-      # TODO
-      raise StandardError, "TODO: pybitcointools can do it, `bitcoin.privtopub and test!"
-    end
+  def initialize(encrypt_key, source_data, options = {})
+    @source_data, @encrypt_key = source_data, encrypt_key
 
     if options[:sender_pubkey]
       @sender_pubkey = options[:sender_pubkey]
       @sender_addr = Bitcoin.pubkey_to_address(sender_pubkey)
+    elsif options.has_key? :sender_addr
+      @sender_addr = options[:sender_addr]
+    else
+      raise MissingSenderAddr
     end
 
-    @sender_addr = options[:sender_addr] if options[:sender_addr]
-
-    raise MissingSenderAddr unless sender_addr
+    @receiver_addr = options[:receiver_addr] if options.has_key? :receiver_addr
 
     @prefix = options[:prefix] || PREFIX
   end
 
   def to_opmultisig
     raise MissingPubkey unless sender_pubkey
-    raise DataTooLarge if (source_data.length + prefix.length) > BYTES_IN_MULTISIG
 
-    padding = 0.chr * (BYTES_IN_MULTISIG - prefix.length)
+    data_length = BYTES_IN_MULTISIG-prefix.length
+    p2pkh_wrap collect_chunks(source_data,data_length){|chunk| 
+      padding = 0.chr * (data_length-chunk.length)
 
-    data = encrypt [source_data.length.chr, prefix, source_data, padding].join
+      data = encrypt [(chunk.length+prefix.length).chr,prefix, chunk, padding].join
 
-    data_keys = [(0...31), (31...62)].collect{|r| make_fully_valid data[r] }
+      data_keys = [(0...31), (31...62)].collect{|r| data_to_pubkey data[r] }
 
-    p2pkh_wrap(
-      MULTISIG % [(data_keys + [sender_pubkey]).join(' '), data_keys.length+1] )
+      MULTISIG % [(data_keys + [sender_pubkey]).join(' '), 3]
+    }
+  end
+
+  def to_pubkeyhash
+    p2pkh_wrap collect_chunks(source_data, BYTES_IN_PUBKEYHASH-prefix.length){ |chunk|
+      data_length = prefix.length + chunk.length
+
+      padding = 0.chr * (BYTES_IN_PUBKEYHASH - data_length)
+  
+      enc_chunk = encrypt [(data_length).chr, prefix, chunk, padding].join
+
+      P2PKH % enc_chunk.unpack('H*').first
+    }
   end
 
   def to_opreturn
+    # I'm fairly certain that using more than one OP_RETURN per transaction is
+    # unstandard behavior right now
     raise DataTooLarge if (source_data.length + prefix.length) > BYTES_IN_OPRETURN
 
     data = encrypt [prefix,source_data].join
 
     p2pkh_wrap( OPRETURN % data.unpack('H*').first )
-  end
-
-  def to_pubkeyhash
-    # TODO:
-
-    # Here's how padding works in the pubkeyhash
-    # assert pad_length >= 0
-    # data_chunk = bytes([len(data_chunk)]) + data_chunk + (pad_length * b'\x00')
-    # data_chunk = key.encrypt(data_chunk)
   end
 
   def encrypt(chunk)
@@ -83,8 +86,9 @@ class Counterparty::TxEncode
   private
 
   def p2pkh_wrap(operation)
-    [ P2PKH % Bitcoin.hash160_from_address(receiver_addr), operation,
-      P2PKH % Bitcoin.hash160_from_address(sender_addr) ].join("\n")
+    [ (receiver_addr) ? P2PKH % Bitcoin.hash160_from_address(receiver_addr) :nil, 
+      operation,
+      P2PKH % Bitcoin.hash160_from_address(sender_addr) ].flatten.compact
   end
 
   # Take a too short data pubkey and make it look like a real pubkey.
@@ -94,12 +98,11 @@ class Counterparty::TxEncode
   # the ECDSA curve). Find the correct bytes by guessing randomly until the check
   # passes. (In parsing, these two bytes are ignored.)
   #
-  # NOTE: This is a shitty name for a function, I only used it because it was
-  #   the reference implementation's name. Interface, not implementation.
-  def make_fully_valid(pubkey_bytes)
-    raise InvalidPubkey unless pubkey_bytes.length == 31
+  # NOTE: This function is named "make_fully_valid" in the official code. 
+  def data_to_pubkey(bytes)
+    raise InvalidPubkey unless bytes.length == 31
 
-    random_bytes = Digest::SHA256.digest pubkey_bytes
+    random_bytes = Digest::SHA256.digest bytes
 
     # Deterministically generated, for unit tests.
     sign = (random_bytes[0].ord & 1) + 2
@@ -109,7 +112,7 @@ class Counterparty::TxEncode
       nonce += 1
       next if nonce == initial_nonce
 
-      ret = (sign.chr + pubkey_bytes + (nonce % 256).chr).unpack('H*').first
+      ret = (sign.chr + bytes + (nonce % 256).chr).unpack('H*').first
 
     # Note that 256 is the exclusive limit:
     end until Bitcoin.valid_pubkey? ret
@@ -121,4 +124,10 @@ class Counterparty::TxEncode
     ret
   end
 
+  # This is a little helper method that lets us split our binary data into 
+  # chunks for further processing
+  def collect_chunks(data,chunk_length, &block)
+    (source_data.length.to_f / chunk_length).ceil.times.collect{|i| 
+      block.call source_data.slice(i*chunk_length, chunk_length) }
+  end
 end
