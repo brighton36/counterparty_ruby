@@ -86,7 +86,7 @@ class Counterparty::TxEncode
   private
 
   def p2pkh_wrap(operation)
-    [ (receiver_addr) ? P2PKH % Bitcoin.hash160_from_address(receiver_addr) :nil, 
+    [ (receiver_addr) ? P2PKH % Bitcoin.hash160_from_address(receiver_addr) : nil, 
       operation,
       P2PKH % Bitcoin.hash160_from_address(sender_addr) ].flatten.compact
   end
