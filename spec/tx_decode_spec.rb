@@ -200,6 +200,63 @@ describe Counterparty::TxDecode do
       tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
       expect{ Counterparty::TxDecode.new tx }.to raise_error(::Counterparty::TxDecode::MultisigUnsupported)
     end
+
+    it "Doesn't parse this weird double output send to self" do
+      # Txid: http://www.blockscan.com/txInfo/11675374
+      # b062d52f7749cf46cbe01e8dd16fe2b7edd6483269c8a0ac5b0b3f8ea6370e5f
+
+      raw_tx = '01000000015869b4a6e10d9540621b168e9cde9fa45fd79540725a3512c6'+
+        'be63a8ab81d154020000006b483045022100f92d69473147027150680b138b70e1f'+
+        '89fef78c8e276f7cd251ebb226fd4c4bb0220673e07a6323c0bc7e927939a062ec2'+
+        'c557b585b45cc2336bbcb0131d15fe835b012102a51147c9e3a554ed35e20cc5ca0'+
+        'fef20e47ae976cfe06a594e135e416bb05e32ffffffff0436150000000000001976'+
+        'a9144de50dc01362d6ad9b4365a56167dae8c029bba188ac3615000000000000197'+
+        '6a9149c834113474128c7c59eec778d57cbcca48839be88ac00000000000000001e'+
+        '6a1c4a789161a23e6f1be8c311a7aa330f31a9ca450a1cec95caca0df2c89fc97c0'+
+        '0000000001976a9144de50dc01362d6ad9b4365a56167dae8c029bba188ac00000000'
+
+      tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
+      expect{ Counterparty::TxDecode.new tx }.to raise_error(
+        ::Counterparty::TxDecode::UndefinedBehavior)
+    end
+
+    it "Data before addresses" do
+      # Txid: http://www.blockscan.com/txInfo/11675370
+      # 54d181aba863bec612355a724095d75fa49fde9c8e161b6240950de1a6b46958
+
+      raw_tx = '01000000017b66db9fdbdddc72fe24bfc9a85842d8bd68f75300756b7b7b'+
+        'bff250e2874071020000006a47304402207207e0204153c828ef3357252a52d522a'+
+        '07f43ba2024582312f02507c4b57ca1022037f2182ee6f664d235879119c6ff10d5'+
+        '3e2dfa6bce0126bcb68af78ce2c4dd32012102a51147c9e3a554ed35e20cc5ca0fe'+
+        'f20e47ae976cfe06a594e135e416bb05e32ffffffff0300000000000000001e6a1c'+
+        'd5a46d783d4d425b6e0c4fe1bcc1bc3fb8827e67e81199ff98d0d2f636150000000'+
+        '000001976a9149c834113474128c7c59eec778d57cbcca48839be88ac1b1b7d0000'+
+        '0000001976a9144de50dc01362d6ad9b4365a56167dae8c029bba188ac00000000'
+
+      tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
+      expect{ Counterparty::TxDecode.new tx }.to raise_error(
+        ::Counterparty::TxDecode::UndefinedBehavior)
+    end
+
+    it "Doesn't parse this weird double-output spend" do
+      # Txid: http://www.blockscan.com/txInfo/11674475
+      # 99beec983f9b700629cb3283b5444e837b73790d2e0eec60f00fdb443340d446
+
+      raw_tx = '0100000001f2e2738960c4f488f0913ebbbb787e3f4db6e953a099275a56'+
+        'e75be340c58424020000006b483045022100f241dfcc797e46978bc2cfd54976dac'+
+        '32edb03c5022367bb50bb9bdec45ebaab02206039b0a664cfa3d7190405a1fbdb63'+
+        '497bfb066dcd4f70e8a574024823c01cc6012102a51147c9e3a554ed35e20cc5ca0'+
+        'fef20e47ae976cfe06a594e135e416bb05e32ffffffff0436150000000000001976'+
+        'a9149c834113474128c7c59eec778d57cbcca48839be88ac3615000000000000197'+
+        '6a914bce6192508e34eba664cfe21dd495c59d5501c2088ac00000000000000001e'+
+        '6a1ce85876dd554d039aaee671e845972981b6a0e283de1a7ea8c59df734330c7e0'+
+        '0000000001976a9144de50dc01362d6ad9b4365a56167dae8c029bba188ac00000000'
+
+      tx = Bitcoin::P::Tx.new [raw_tx].pack('H*')
+      expect{ Counterparty::TxDecode.new tx }.to raise_error(
+        ::Counterparty::TxDecode::UndefinedBehavior)
+    end
+
   end
 end
 

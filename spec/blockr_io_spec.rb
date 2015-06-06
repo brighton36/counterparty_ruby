@@ -61,8 +61,22 @@ describe BlockrIo do
       end
     end
       
+    describe "#listunspent" do
+      it "should list unspent transactions" do
+        unspents = blockr_main.listunspent('1CounterpartyXXXXXXXXXXXXXXXUWLpVr')
+
+        expect(unspents.length).to eq(2620)
+        expect(unspents.first.tap{|u| u.delete('confirmations') }).to eq( { 
+          "tx"=>"bcd6fd6997d26ae12caef102f5e9631ee2ed1e38eaa16547a51d908f4c5ddac8", 
+          "amount"=>"0.00005430", "n"=>0, 
+          "script"=>"76a914818895f3dc2c178629d3d2d8fa3ec4a3f817982188ac"} )
+
+      end
+    end
+
     describe "#sendrawtransaction"  do
       # I think the way to test this is simply to do so in the resource_create
     end
+
   end
 end

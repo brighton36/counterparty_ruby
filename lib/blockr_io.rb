@@ -24,6 +24,16 @@ class BlockrIo
     @is_testing
   end
 
+  def listunspent(addr, include_unconfirmed = false)
+    query = [addr,(include_unconfirmed) ? '?unconfirmed=1' : nil ].join
+    json_get('address', 'unspent', query)['data']['unspent']
+  end
+
+  # Shows all the transactions that are unconfirmed for the provided address:
+  def listunconfirmed(addr)
+    json_get('address','unconfirmed',addr)['data']['unconfirmed']
+  end
+
   private
 
   def request(*path, &block)
