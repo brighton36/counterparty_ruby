@@ -26,6 +26,11 @@ setting everything up.
 ![Party On Wayne](http://data.whicdn.com/images/24796384/tumblr_m0ng6rBeWT1qhd0xso1_500_large.jpg)
 
 ## Changelog
+_Version 1.2_
+  * Minor refactoring
+  * Added an extensive suite of tests for transaction encoding and decoding
+  * Implemented a counterparty transaction TxEncode/TxDecode class to decode counterparty transactions without a need for counterpartyd
+
 _Version 1.1_
   * Minor Updates to support changes in counterpartyd 1.1
   * Removed support for relaying transactions through counterparty
