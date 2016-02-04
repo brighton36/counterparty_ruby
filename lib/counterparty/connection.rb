@@ -1,7 +1,7 @@
 module Counterparty
-  # This class connects to the Counterparty api. Mostly it's not intended for 
-  # use by library consumers, but there are some helper methods in here for 
-  # those that prefer the Connection.get_burns syntax instead of the 
+  # This class connects to the Counterparty api. Mostly it's not intended for
+  # use by library consumers, but there are some helper methods in here for
+  # those that prefer the Connection.get_burns syntax instead of the
   # Counterparty::Burn.find syntax
   class Connection
     # The default connection timeout, nil is "no timeout"
@@ -9,11 +9,11 @@ module Counterparty
 
     attr_accessor :host, :port, :username, :password
 
-    # A response timeout threshold By default, this initializes to -1, 
+    # A response timeout threshold By default, this initializes to -1,
     # which means the library will wait indefinitely before timing out
     attr_writer :timeout
 
-    def initialize(port=4000, username='counterparty', password='1234', host='xcp-dev.vennd.io')
+    def initialize(port=14000, username='rpc', password='1234', host='public.coindaddy.io')
       @host,@port,@username,@password=host.to_s,port.to_i,username.to_s,password.to_s
       @timeout = DEFAULT_TIMEOUT
     end
@@ -28,13 +28,13 @@ module Counterparty
       request 'sign_tx', unsigned_tx_hex: raw_tx, privkey: private_key
     end
 
-    # Issue a request to the counterpartyd server for the given method, with the 
+    # Issue a request to the counterpartyd server for the given method, with the
     # given params.
     def request(method, params)
       client = RestClient::Resource.new api_url, :timeout => @timeout
       request = { method: method, params: params, jsonrpc: '2.0', id: '0' }.to_json
       response = JSON.parse client.post(request,
-        user: @username, password: @password, accept: 'json', 
+        user: @username, password: @password, accept: 'json',
         content_type: 'json' )
 
       raise JsonResponseError.new response if response.has_key? 'code'
@@ -53,11 +53,11 @@ module Counterparty
 
     # Go ahead and setup the defined resources, and throw them into the native-style
     # api methods:
-    Counterparty.constants.each do |c| 
+    Counterparty.constants.each do |c|
       begin
         klass = Counterparty.const_get(c)
         if klass.respond_to?(:api_name) && klass != Counterparty::CounterResource
-          self.resource_request klass 
+          self.resource_request klass
         end
       rescue NameError
         next
