@@ -1,4 +1,6 @@
-*.swp
-*.swo
 *.gem
+*.swo
+*.swp
+/.bundle/
+/vendor/
 doc
