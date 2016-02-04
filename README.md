@@ -70,7 +70,7 @@ json-esque call syntax.
   require 'counterparty_ruby'
 
   # This connects to production mode on localhost:
-  production = Counterparty.connection.new 4000
+  production = Counterparty::Connection.new 4000
 
   # Note that we follow the api reference for calls here:
   burns = production.get_burns order_by: 'tx_hash', order_dir: 'asc', 
