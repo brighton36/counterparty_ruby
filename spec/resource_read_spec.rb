@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 # NOTE: Most of these examples are from: 
-# https://github.com/CounterpartyXCP/counterpartyd/blob/master/docs/API.rst#id8
+# https://github.com/CounterpartyXCP/Documentation/blob/master/Developers/API.md
 describe Counterparty do
   include_context 'globals'
 
