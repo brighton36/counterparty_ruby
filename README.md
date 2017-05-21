@@ -3,7 +3,7 @@ counterparty_ruby [![Gem Version](https://badge.fury.io/rb/counterparty_ruby.svg
 A ruby gem for communicating with a Counterparty (Bitcoin / XCP) API server.
 
 What's up party people! [Chris DeRose](https://www.chrisderose.com) here, 
-community director of the [Counterparty Foundation](http://counterpartyfoundation.org/), 
+ex-community director of the [Counterparty Foundation](http://counterpartyfoundation.org/), 
 and today we're going to discuss.... Ruby! Or more specifically, how to start using
 counterparty in your ruby and/or ruby on rails app.
 
